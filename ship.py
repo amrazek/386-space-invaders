@@ -23,6 +23,8 @@ class Ship(Sprite):
         # store a decimal for the ship's position
         self.center = float(self.rect.centerx)
 
+        self.destroyed = False
+
     def update(self, input_state, elapsed):
         # update ship's position, not its rect
         if input_state.left ^ input_state.right:
@@ -38,3 +40,6 @@ class Ship(Sprite):
     def center_ship(self):
         """Center the ship on the screen"""
         self.center = self.screen_rect.centerx
+
+    def hit(self):
+        self.destroyed = True

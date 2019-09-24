@@ -19,11 +19,11 @@ class Alien(AnimatedSprite):
         # store the alien's exact position
         self.x = float(self.rect.x)
 
-    def update(self):
+    def update(self, elapsed):
         super().update()
 
         """Move the alien right or left."""
-        self.x += (self.ai_settings.alien_speed_factor * self.ai_settings.fleet_direction)
+        self.x += (self.ai_settings.alien_speed * self.ai_settings.fleet_direction * elapsed)
         self.rect.x = self.x
 
     def check_edges(self):

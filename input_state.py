@@ -7,7 +7,7 @@ class InputState:
         self.left, self.right, self.fire = False, False, False
         self.quit = False
 
-        self.left_click = False
+        self.left_down = False
         self.mouse_pos = (0, 0)
 
         self.key_actions = {
@@ -46,6 +46,6 @@ class InputState:
                         action(state)
 
                 elif evt.type == pygame.MOUSEBUTTONDOWN:
-                    self.left_click = True
+                    self.left_down = True
                 elif evt.type == pygame.MOUSEBUTTONUP:
-                    self.left_click = False
+                    self.left_down = False

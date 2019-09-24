@@ -25,7 +25,7 @@ class Settings:
         """Initialize settings that change throughout the game"""
         self.ship_speed = 450       # pixels per second
         self.bullet_speed = 600
-        self.alien_speed = 500
+        self.alien_speed = 100
 
         # fleet_direction of 1 represents right; -1 represents left
         self.fleet_direction = 1
