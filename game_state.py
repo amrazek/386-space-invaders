@@ -1,13 +1,12 @@
 import pygame
 from settings import Settings
 from ship import Ship
-from alien import Alien
-from bullet import Bullet
-from input_state import InputState
+from bullet import BulletManager
 from button import Button
 from alien_fleet import AlienFleet
 from game_stats import GameStats
 from scoreboard import Scoreboard
+
 
 class GameState:
     def __init__(self, input_state):
@@ -65,16 +64,23 @@ class RunGame(GameState):
         self.stats = GameStats(self.ai_settings)
         self.scoreboard = Scoreboard(self.ai_settings, self.stats)
 
+        self.bullets = BulletManager()
+
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
         self.fleet.update(elapsed)
+        self.bullets.update(elapsed)
 
         if self.ship.destroyed:
             self.__player_destroyed()
 
+        if self.input_state.fire:
+            self.ship.fire(self.bullets)
+
     def draw(self, screen):
         screen.fill(color=(0, 0, 50))
         screen.blit(self.ship.image, self.ship.rect)
+        self.bullets.draw(screen)
         self.fleet.draw(screen)
         self.scoreboard.draw(screen)
 

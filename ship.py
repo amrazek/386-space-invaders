@@ -1,6 +1,7 @@
 import pygame
 from pygame.sprite import Sprite
 import config
+from bullet import Bullet
 
 
 class Ship(Sprite):
@@ -25,6 +26,9 @@ class Ship(Sprite):
 
         self.destroyed = False
 
+        self.last_shot = 0
+        self.min_time_between_shots = round(1000.0 / ai_settings.bullets_per_second)
+
     def update(self, input_state, elapsed):
         # update ship's position, not its rect
         if input_state.left ^ input_state.right:
@@ -43,3 +47,11 @@ class Ship(Sprite):
 
     def hit(self):
         self.destroyed = True
+
+    def fire(self, bullet_manager):
+        current_tick = pygame.time.get_ticks()
+
+        if current_tick - self.last_shot >= self.min_time_between_shots:
+            self.last_shot = current_tick
+            bullet = Bullet(self.ai_settings, self)
+            bullet_manager.add(bullet)

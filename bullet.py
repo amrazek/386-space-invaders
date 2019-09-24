@@ -1,5 +1,5 @@
 import pygame
-from pygame.sprite import Sprite
+from pygame.sprite import Sprite, Group
 import config
 
 
@@ -20,15 +20,34 @@ class Bullet(Sprite):
         self.y = float(self.rect.y)
 
         self.color = ai_settings.bullet_color
-        self.speed_factor = ai_settings.bullet_speed_factor
+        self.speed_factor = ai_settings.bullet_speed
 
-        self.image = pygame.Surface(ai_settings.bullet_width, ai_settings.bullet_height)
+        self.image = pygame.Surface((ai_settings.bullet_width, ai_settings.bullet_height))
         self.image.fill(color=self.color)
 
-    def update(self):
+    def update(self, elapsed):
         """Move the bullet up the screen"""
         # Update the decimal position of the bullet
-        self.y -= self.speed_factor
+        self.y -= self.speed_factor * elapsed
 
         # Update the rect position
         self.rect.y = self.y
+
+
+class AlienBullet(Bullet):
+    def __init__(self, ai_settings, ship):
+        super().__init__(ai_settings, ship)
+
+
+class BulletManager:
+    def __init__(self):
+        self._bullets = Group()
+
+    def add(self, new_bullet):
+        self._bullets.add(new_bullet)
+
+    def update(self, elapsed):
+        self._bullets.update(elapsed)
+
+    def draw(self, screen):
+        self._bullets.draw(screen)
