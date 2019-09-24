@@ -1,7 +1,7 @@
 import pygame.font
 from pygame.sprite import Group
 from ship import Ship
-
+import sprite_atlas
 
 class Scoreboard:
     """A class to report scoring information"""
@@ -14,7 +14,7 @@ class Scoreboard:
         self.stats = stats
 
         # Font settings for scoring information
-        self.text_color = (30, 30, 30)
+        self.text_color = (230, 230, 230)
         self.font = pygame.font.SysFont(None, 48)
 
         # initialize variables to make PEP happy
@@ -33,7 +33,7 @@ class Scoreboard:
         """ Turn the score into a rendered image."""
         rounded_score = int(round(self.stats.score, -1))
         score_str = "{:,}".format(rounded_score)
-        self.score_image = self.font.render(score_str, True, self.text_color, self.ai_settings.bg_color)
+        self.score_image = self.font.render(score_str, True, self.text_color)
 
         # Display the score at the top right of the screen
         self.score_rect = self.score_image.get_rect()
@@ -44,7 +44,7 @@ class Scoreboard:
         """Turn the high score into a rendered image."""
         high_score = int(round(self.stats.high_score, -1))
         high_score_str = "{:,}".format(high_score)
-        self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.ai_settings.bg_color)
+        self.high_score_image = self.font.render(high_score_str, True, self.text_color)
 
         # Center the high score at the top of the screen
         self.high_score_rect = self.high_score_image.get_rect()
@@ -53,7 +53,7 @@ class Scoreboard:
 
     def prep_level(self):
         """Turn the level into a rendered image."""
-        self.level_image = self.font.render(str(self.stats.level), True, self.text_color, self.ai_settings.bg_color)
+        self.level_image = self.font.render(str(self.stats.level), True, self.text_color)
 
         # Position the level below the score
         self.level_rect = self.level_image.get_rect()

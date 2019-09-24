@@ -5,17 +5,17 @@ from alien import Alien
 from time import sleep
 
 
-def check_key_down_events(event, ai_settings, screen, ship, bullets):
-    """Respond to key presses."""
-    if event.key == pygame.K_RIGHT:
-        # move the ship to the right
-        ship.moving_right = True
-    elif event.key == pygame.K_LEFT:
-        ship.moving_left = True
-    elif event.key == pygame.K_SPACE:
-        fire_bullet(ai_settings, screen, ship, bullets)
-    elif event.key == pygame.K_q:
-        sys.exit()
+# def check_key_down_events(event, ai_settings, screen, ship, bullets):
+#     """Respond to key presses."""
+#     if event.key == pygame.K_RIGHT:
+#         # move the ship to the right
+#         ship.moving_right = True
+#     elif event.key == pygame.K_LEFT:
+#         ship.moving_left = True
+#     elif event.key == pygame.K_SPACE:
+#         fire_bullet(ai_settings, screen, ship, bullets)
+#     elif event.key == pygame.K_q:
+#         sys.exit()
 
 
 def fire_bullet(ai_settings, screen, ship, bullets):
@@ -26,28 +26,28 @@ def fire_bullet(ai_settings, screen, ship, bullets):
         bullets.add(new_bullet)
 
 
-def check_key_up_events(event, ship):
-    if event.key == pygame.K_RIGHT:
-        ship.moving_right = False
-    elif event.key == pygame.K_LEFT:
-        ship.moving_left = False
-
-
-def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
-    """Respond to keyboard and mouse events"""
-    # watch for keyboard and mouse events
-    for evt in pygame.event.get():
-        if evt.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif evt.type == pygame.KEYDOWN:
-            check_key_down_events(evt, ai_settings, screen, ship, bullets)
-
-        elif evt.type == pygame.KEYUP:
-            check_key_up_events(evt, ship)
-        elif evt.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+# def check_key_up_events(event, ship):
+#     if event.key == pygame.K_RIGHT:
+#         ship.moving_right = False
+#     elif event.key == pygame.K_LEFT:
+#         ship.moving_left = False
+#
+#
+# def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
+#     """Respond to keyboard and mouse events"""
+#     # watch for keyboard and mouse events
+#     for evt in pygame.event.get():
+#         if evt.type == pygame.QUIT:
+#             pygame.quit()
+#             sys.exit()
+#         elif evt.type == pygame.KEYDOWN:
+#             check_key_down_events(evt, ai_settings, screen, ship, bullets)
+#
+#         elif evt.type == pygame.KEYUP:
+#             check_key_up_events(evt, ship)
+#         elif evt.type == pygame.MOUSEBUTTONDOWN:
+#             mouse_x, mouse_y = pygame.mouse.get_pos()
+#             check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 
 def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
@@ -80,26 +80,26 @@ def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens,
         ship.center_ship()
 
 
-def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
-    # redraw screen
-    screen.fill(ai_settings.bg_color)
-
-    # Redraw all bullets behind ship and aliens
-    for bullet in bullets.sprites():
-        bullet.draw_bullet()
-
-    ship.draw_me()
-    aliens.draw(screen)
-
-    # Draw the score information
-    sb.show_score()
-
-    # Draw the play button if the game is inactive.
-    if not stats.game_active:
-        play_button.draw_button()
-
-    # make most recently drawn screen visible
-    pygame.display.flip()
+# def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
+#     # redraw screen
+#     screen.fill(ai_settings.bg_color)
+#
+#     # Redraw all bullets behind ship and aliens
+#     for bullet in bullets.sprites():
+#         bullet.draw_bullet()
+#
+#     ship.draw_me()
+#     aliens.draw(screen)
+#
+#     # Draw the score information
+#     sb.show_score()
+#
+#     # Draw the play button if the game is inactive.
+#     if not stats.game_active:
+#         play_button.draw_button()
+#
+#     # make most recently drawn screen visible
+#     pygame.display.flip()
 
 
 def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):

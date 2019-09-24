@@ -4,11 +4,6 @@ class Settings:
     def __init__(self):
         """Initialize the game's settings"""
 
-        # Screen settings
-        self.screen_width = 1000
-        self.screen_height = 600
-        self.bg_color = (230, 230, 230)
-
         # ship settings
         self.ship_limit = 3
 
@@ -27,20 +22,10 @@ class Settings:
         # How quickly alien point values increase
         self.score_scale = 1.5
 
-        # dynamic values (initialized to make PEP8 happy)
-        self.ship_speed_factor = 1.5
-        self.bullet_speed_factor = 2
-        self.alien_speed_factor = 1
-        self.fleet_direction = 1
-        self.alien_points = 50
-
-        self.initialize_dynamic_settings()
-
-    def initialize_dynamic_settings(self):
         """Initialize settings that change throughout the game"""
-        self.ship_speed_factor = 1.5
-        self.bullet_speed_factor = 2
-        self.alien_speed_factor = 1
+        self.ship_speed = 450       # pixels per second
+        self.bullet_speed = 600
+        self.alien_speed = 500
 
         # fleet_direction of 1 represents right; -1 represents left
         self.fleet_direction = 1
