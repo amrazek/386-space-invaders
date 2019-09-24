@@ -1,15 +1,15 @@
 import pygame.font
 from pygame.sprite import Group
 from ship import Ship
-import sprite_atlas
+import config
+
 
 class Scoreboard:
     """A class to report scoring information"""
 
-    def __init__(self, ai_settings, screen, stats):
+    def __init__(self, ai_settings, stats):
         """Initialize score-keeping attributes."""
-        self.screen = screen
-        self.screen_rect = screen.get_rect()
+
         self.ai_settings = ai_settings
         self.stats = stats
 
@@ -37,7 +37,7 @@ class Scoreboard:
 
         # Display the score at the top right of the screen
         self.score_rect = self.score_image.get_rect()
-        self.score_rect.right = self.screen_rect.right - 20
+        self.score_rect.right = config.screen_rect.right - 20
         self.score_rect.top = 20
 
     def prep_high_score(self):
@@ -48,7 +48,7 @@ class Scoreboard:
 
         # Center the high score at the top of the screen
         self.high_score_rect = self.high_score_image.get_rect()
-        self.high_score_rect.centerx = self.screen_rect.centerx
+        self.high_score_rect.centerx = config.screen_rect.centerx
         self.high_score_rect.top = self.score_rect.top
 
     def prep_level(self):
@@ -64,16 +64,16 @@ class Scoreboard:
         """Show how many ships are left."""
         self.ships = Group()
         for ship_number in range(self.stats.ships_left):
-            ship = Ship(self.ai_settings, self.screen)
+            ship = Ship(self.ai_settings)
             ship.rect.x = 10 + ship_number * ship.rect.width
             ship.rect.y = 10
             self.ships.add(ship)
 
-    def show_score(self):
+    def draw(self, screen):
         """Draw the scores and ships to the screen."""
-        self.screen.blit(self.score_image, self.score_rect)
-        self.screen.blit(self.high_score_image, self.high_score_rect)
-        self.screen.blit(self.level_image, self.level_rect)
+        screen.blit(self.score_image, self.score_rect)
+        screen.blit(self.high_score_image, self.high_score_rect)
+        screen.blit(self.level_image, self.level_rect)
 
-        # DRaw ships
-        self.ships.draw(self.screen)
+        # Draw ships
+        self.ships.draw(screen)

@@ -7,6 +7,7 @@ from input_state import InputState
 from button import Button
 from alien_fleet import AlienFleet
 from game_stats import GameStats
+from scoreboard import Scoreboard
 
 class GameState:
     def __init__(self, input_state):
@@ -62,6 +63,7 @@ class RunGame(GameState):
         self.ship = Ship(self.ai_settings)
         self.fleet = AlienFleet(self.ai_settings, self.ship)
         self.stats = GameStats(self.ai_settings)
+        self.scoreboard = Scoreboard(self.ai_settings, self.stats)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
@@ -74,6 +76,7 @@ class RunGame(GameState):
         screen.fill(color=(0, 0, 50))
         screen.blit(self.ship.image, self.ship.rect)
         self.fleet.draw(screen)
+        self.scoreboard.draw(screen)
 
     @property
     def finished(self):
