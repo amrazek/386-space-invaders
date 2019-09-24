@@ -6,7 +6,7 @@ from game_stats import GameStats
 from button import Button
 from scoreboard import Scoreboard
 import game_functions as gf
-
+import sprite_atlas
 
 def run_game():
     # initialize PyGame and create screen surface
@@ -14,7 +14,10 @@ def run_game():
     ai_settings = Settings()
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
 
-    pygame.display.set_caption("Alien Invasion")
+    pygame.display.set_caption("Space Invaders")
+
+    # load all animated sprite images needed for the game
+    sprite_atlas.load_atlas()
 
     # Make the play button
     play_button = Button(screen, "Play")

@@ -13,7 +13,7 @@ class Ship(Sprite):
 
         # load the ship image and get its rect
         self.image = pygame.image.load("images/ship.bmp")
-        gf.set_color_key_from_pixel(self.image, (0, 0))
+        #gf.set_color_key_from_pixel(self.image, (0, 0))
 
         self.rect = self.image.get_rect()
         self.screen_rect = screen.get_rect()

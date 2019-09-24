@@ -245,9 +245,3 @@ def check_high_score(stats, sb):
     if stats.score > stats.high_score:
         stats.high_score = stats.score
         sb.prep_high_score()
-
-
-def set_color_key_from_pixel(image, coord):
-    color = image.get_at(coord)
-
-    image.set_colorkey(color, pygame.RLEACCEL)
