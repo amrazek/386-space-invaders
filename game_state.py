@@ -60,7 +60,11 @@ class RunGame(GameState):
         super().__init__(input_state)
         self.ai_settings = Settings()
         self.ship = Ship(self.ai_settings)
-        self.fleet = AlienFleet(self.ai_settings, self.ship)
+
+        self.fleet = AlienFleet(self.ai_settings, self.ship,
+                                f_on_clear=self.__on_fleet_destroyed,
+                                f_on_kill=self.__on_alien_killed)
+
         self.stats = GameStats(self.ai_settings)
         self.scoreboard = Scoreboard(self.ai_settings, self.stats)
 
@@ -68,7 +72,7 @@ class RunGame(GameState):
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
-        self.fleet.update(elapsed)
+        self.fleet.update(elapsed, self.bullets)
         self.bullets.update(elapsed)
 
         if self.ship.destroyed:
@@ -97,12 +101,28 @@ class RunGame(GameState):
             self.stats.ships_left -= 1
 
             # create a new fleet
-            self.fleet = AlienFleet(self.ai_settings, self.ship)
+            self.fleet.create_new_fleet()
 
-            # reset player position
+            # reset player position and state
             self.ship.center_ship()
+            self.ship.destroyed = False
 
-            # TODO: update scoreboard
+            # update scoreboard
+            self.scoreboard.prep_ships()
 
         else:  # no ships left
             pass  # TODO
+
+    def __on_alien_killed(self, alien):
+        self.stats.score += self.ai_settings.alien_points
+        self.scoreboard.prep_score()
+        # check_high_score(stats, sb) TODO
+
+    def __on_fleet_destroyed(self):
+        # advance to next level
+        self.stats.level += 1
+        self.ai_settings.increase_speed()
+        self.scoreboard.prep_level()
+
+        # clear all bullets
+        self.bullets.clear()

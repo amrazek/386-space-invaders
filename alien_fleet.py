@@ -5,13 +5,15 @@ import config
 
 
 class AlienFleet:
-    def __init__(self, ai_settings, ship):
+    def __init__(self, ai_settings, ship, f_on_clear, f_on_kill):
         self.ai_settings = ai_settings
         self.ship = ship
+        self.on_clear = f_on_clear
+        self.on_kill = f_on_kill
         self.aliens = Group()
-        self.__create_new_fleet()
+        self.create_new_fleet()
 
-    def update(self, elapsed):
+    def update(self, elapsed, player_bullets):
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
         self.__check_fleet_edges()
         self.aliens.update(elapsed)
@@ -23,10 +25,13 @@ class AlienFleet:
         # Look for aliens hitting the bottom of the screen
         self.__check_aliens_bottom()
 
+        # Look for player bullet->alien collisions
+        self.__check_bullet_alien_collisions(player_bullets)
+
     def draw(self, screen):
         self.aliens.draw(screen)
 
-    def __create_new_fleet(self):
+    def create_new_fleet(self):
         """Create a full fleet of aliens"""
         # Create an alien and find the number of aliens in a row.
         alien = Alien(self.ai_settings)
@@ -87,3 +92,18 @@ class AlienFleet:
                 # Treat this the same as if the ship got hit
                 self.ship.hit()
                 break
+
+    def __check_bullet_alien_collisions(self, bullets):
+        """Respond to bullet-alien collisions."""
+        # Remove any bullets and aliens that have collided
+        collisions = pygame.sprite.groupcollide(bullets, self.aliens, True, True)
+
+        if collisions:
+            for aliens in collisions.values():
+                for an_alien in aliens:
+                    self.on_kill(an_alien)
+
+        if len(self.aliens) == 0:
+            # If the entire fleet is destroyed, start a new level
+            self.on_clear()
+            self.create_new_fleet()

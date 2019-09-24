@@ -49,5 +49,16 @@ class BulletManager:
     def update(self, elapsed):
         self._bullets.update(elapsed)
 
+        # Get rid of bullets that have disappeared
+        for bullet in self._bullets.copy():
+            if bullet.rect.bottom <= 0 or bullet.rect.top >= config.screen_height:
+                self._bullets.remove(bullet)
+
+    def clear(self):
+        self._bullets.empty()
+
     def draw(self, screen):
         self._bullets.draw(screen)
+
+    def sprites(self):
+        return self._bullets.sprites()
