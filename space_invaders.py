@@ -1,6 +1,6 @@
 import pygame
 import sprite_atlas
-from game_state import GameState
+from states.run_game import RunGame
 from input_state import InputState
 import config
 
@@ -17,7 +17,7 @@ def run_game():
 
     # init game
     input_state = InputState()
-    game_state = GameState.create_initial(input_state)
+    game_state = RunGame(input_state)
 
     # start main loop for the game
     elapsed = 0.0
