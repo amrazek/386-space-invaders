@@ -18,8 +18,8 @@ class RunGame(GameState):
                                 on_clear_callback=self.__on_fleet_destroyed,
                                 on_kill_callback=self.__on_alien_killed)
 
-        self.stats = GameStats(self.ai_settings)
-        self.scoreboard = Scoreboard(self.ai_settings, self.stats)
+        self.scoreboard = Scoreboard(self.ai_settings)
+        self.stats = GameStats(self.ai_settings, self.scoreboard)
 
         self.bullets = BulletManager()
 
@@ -49,9 +49,9 @@ class RunGame(GameState):
         return None
 
     def __player_destroyed(self):
-        if self.stats.ships_left > 0:
+        if self.stats.player_alive:
             # Reduce player lives
-            self.stats.ships_left -= 1
+            self.stats.decrease_lives()
 
             # create a new fleet
             self.fleet.create_new_fleet()
@@ -60,22 +60,15 @@ class RunGame(GameState):
             self.ship.center_ship()
             self.ship.destroyed = False
 
-            # update scoreboard
-            self.scoreboard.prep_ships()
-
         else:  # no ships left
             pass  # TODO
 
     def __on_alien_killed(self, alien):
-        self.stats.score += self.ai_settings.alien_points
-        self.scoreboard.prep_score()
-        # check_high_score(stats, sb) TODO
+        self.stats.increase_score(self.ai_settings.alien_points)
 
     def __on_fleet_destroyed(self):
         # advance to next level
-        self.stats.level += 1
-        self.ai_settings.increase_speed()
-        self.scoreboard.prep_level()
+        self.stats.increase_level()
 
         # clear all bullets
         self.bullets.clear()
