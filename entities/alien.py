@@ -20,7 +20,7 @@ class Alien(AnimatedSprite):
         self.x = float(self.rect.x)
 
     def update(self, elapsed):
-        super().update()
+        super().update(elapsed)
 
         """Move the alien right or left."""
         self.x += (self.ai_settings.alien_speed * self.ai_settings.fleet_direction * elapsed)

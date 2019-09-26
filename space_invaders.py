@@ -2,6 +2,7 @@ import pygame
 import sprite_atlas
 from states.run_game import RunGame
 from states.input_state import InputState
+from timer import Timer
 import config
 
 
@@ -20,18 +21,15 @@ def run_game():
     game_state = RunGame(input_state)
 
     # start main loop for the game
-    elapsed = 0.0
-    last_tick = pygame.time.get_ticks()
+    timer = Timer()
 
     while not input_state.quit and game_state is not None:
         input_state.do_events()
-        game_state.update(elapsed)
+        game_state.update(timer.elapsed)
         game_state.draw(screen)
         pygame.display.flip()
 
-        new_tick = pygame.time.get_ticks()
-        elapsed = (new_tick - last_tick) / 1000.0
-        last_tick = new_tick
+        timer.update()
 
         if game_state.finished:
             game_state = game_state.get_next()
