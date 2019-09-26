@@ -24,7 +24,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
         self.image = self.sprite_sheet.subsurface(self.frames[self.current_frame])
 
-    def update(self):
+    def update(self, elapsed):
         this_tick = pygame.time.get_ticks()
         elapsed = this_tick - self.last_tick
         if elapsed > self.ticks_per_frame:

@@ -1,6 +1,6 @@
 import pygame
 import states
-from button import Button
+from entities.button import Button
 
 
 class PlayButton(states.game_state.GameState):

@@ -1,7 +1,7 @@
 import pygame
 from pygame.sprite import Sprite
 import config
-from bullet import Bullet
+from entities.bullet import Bullet
 
 
 class Ship(Sprite):

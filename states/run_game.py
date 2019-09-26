@@ -1,10 +1,10 @@
 from states.game_state import GameState
 from settings import Settings
-from scoreboard import Scoreboard
-from bullet import BulletManager
+from entities.scoreboard import Scoreboard
+from entities.bullet import BulletManager
 from game_stats import GameStats
-from alien_fleet import AlienFleet
-from ship import Ship
+from controllers.alien_fleet import AlienFleet
+from entities.ship import Ship
 
 
 class RunGame(GameState):

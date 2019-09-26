@@ -1,6 +1,5 @@
 import pygame.font
 import config
-from input_state import InputState
 
 
 class Button:

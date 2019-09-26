@@ -1,6 +1,6 @@
 import pygame
 from pygame.sprite import Group
-from alien import Alien
+from entities.alien import Alien
 import config
 
 

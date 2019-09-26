@@ -1,7 +1,7 @@
 import pygame
 import sprite_atlas
 from states.run_game import RunGame
-from input_state import InputState
+from states.input_state import InputState
 import config
 
 
@@ -23,7 +23,7 @@ def run_game():
     elapsed = 0.0
     last_tick = pygame.time.get_ticks()
 
-    while not input_state.quit and not game_state is None:
+    while not input_state.quit and game_state is not None:
         input_state.do_events()
         game_state.update(elapsed)
         game_state.draw(screen)
