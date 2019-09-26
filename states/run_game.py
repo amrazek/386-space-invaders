@@ -1,6 +1,6 @@
 from states.game_state import GameState
 from states.game_over import GameOver
-from settings import Settings
+from session_stats import SessionStats
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
 from session_stats import SessionStats
@@ -12,15 +12,13 @@ class RunGame(GameState):
     """Manages actual game play, until the player loses."""
     def __init__(self, input_state):
         super().__init__(input_state)
-        self.ai_settings = Settings()
-        self.ship = Ship(self.ai_settings)
 
-        self.fleet = AlienFleet(self.ai_settings, self.ship,
+        self.stats = SessionStats()
+        self.ship = Ship(self.stats)
+        self.scoreboard = Scoreboard(self.stats)
+        self.fleet = AlienFleet(self.stats, self.ship,
                                 on_clear_callback=self.__on_fleet_destroyed,
                                 on_kill_callback=self.__on_alien_killed)
-
-        self.scoreboard = Scoreboard(self.ai_settings)
-        self.stats = SessionStats(self.ai_settings, self.scoreboard)
 
         self.bullets = BulletManager()
         self.game_over = GameOver(input_state, self)
@@ -65,8 +63,11 @@ class RunGame(GameState):
         else:  # no ships left
             pass  # done
 
+        self.scoreboard.set_dirty()
+
     def __on_alien_killed(self, alien):
-        self.stats.increase_score(self.ai_settings.alien_points)
+        self.stats.increase_score(self.stats.alien_points)
+        self.scoreboard.set_dirty()
 
     def __on_fleet_destroyed(self):
         # advance to next level
@@ -74,3 +75,5 @@ class RunGame(GameState):
 
         # clear all bullets
         self.bullets.clear()
+
+        self.scoreboard.set_dirty()

@@ -1,36 +1,39 @@
+import config
+
+
 class SessionStats:
     """Track per-session statistics for Space Invaders."""
 
-    def __init__(self, ai_settings, scoreboard):
+    def __init__(self):
         """Initialize statistics."""
-        self.ai_settings = ai_settings
-        self.scoreboard = scoreboard
+        self.ship_speed = 450       # pixels per second
+        self.bullet_speed = 600
+        self.alien_speed = 100
+        self.bullets_per_second = 5
 
-        # init values to make PEP8 happy
-        self.ships_left = self.ai_settings.ship_limit
-        self.score = 0
-        self.level = 1
+        # fleet_direction of 1 represents right; -1 represents left
+        self.fleet_direction = 1
 
-        # init scoreboard
-        self.set_score(self.score)
-        self.set_level(self.level)
-        self.set_ships_left(self.ships_left)
+        # Scoring
+        self.alien_points = 50
+
+        # initial values
+        self.level, self.score = 0, 0
+        self.ships_left = config.ship_limit
+        self.alien_points = config.initial_point_value  # points per alien killed
 
     def set_level(self, level):
         self.level = level
-        self.scoreboard.set_level(level)
 
     def set_ships_left(self, ships_left):
         self.ships_left = ships_left
-        self.scoreboard.set_ships(ships_left)
 
     def set_score(self, score):
         self.score = score
-        self.scoreboard.set_score(score)
 
     @property
     def player_alive(self):
-        return self.ships_left > 0
+        return self.ships_left >= 0
 
     def decrease_lives(self):
         self.set_ships_left(self.ships_left - 1)
@@ -40,4 +43,12 @@ class SessionStats:
 
     def increase_level(self):
         self.set_level(self.level + 1)
-        self.ai_settings.increase_speed()
+        self.__increase_speed()
+
+    def __increase_speed(self):
+        """Increase speed settings."""
+        self.ship_speed *= config.speedup_scale
+        self.bullet_speed *= config.speedup_scale
+        self.bullets_per_second *= config.speedup_scale
+        self.alien_speed *= config.speedup_scale
+        self.alien_points = int(self.alien_points * config.score_scale)

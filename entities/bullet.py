@@ -6,23 +6,23 @@ import config
 class Bullet(Sprite):
     """A class to manage bullets fired from the ship"""
 
-    def __init__(self, ai_settings, ship):
+    def __init__(self, stats, ship):
         """Create a bullet object at the ship's current position"""
         super().__init__()
 
         # Create a bullet rect at (0, 0) and then set correct position
-        self.rect = pygame.Rect(0, 0, ai_settings.bullet_width,
-                                ai_settings.bullet_height)
+        self.rect = pygame.Rect(0, 0, config.bullet_width,
+                                config.bullet_height)
         self.rect.centerx = ship.rect.centerx
         self.rect.top = ship.rect.top
 
         # Store the bullet's position as a decimal value
         self.y = float(self.rect.y)
 
-        self.color = ai_settings.bullet_color
-        self.speed_factor = ai_settings.bullet_speed
+        self.color = config.bullet_color
+        self.speed_factor = stats.bullet_speed
 
-        self.image = pygame.Surface((ai_settings.bullet_width, ai_settings.bullet_height))
+        self.image = pygame.Surface((config.bullet_width, config.bullet_height))
         self.image.fill(color=self.color)
 
     def update(self, elapsed):
@@ -32,11 +32,6 @@ class Bullet(Sprite):
 
         # Update the rect position
         self.rect.y = self.y
-
-
-class AlienBullet(Bullet):
-    def __init__(self, ai_settings, ship):
-        super().__init__(ai_settings, ship)
 
 
 class BulletManager:

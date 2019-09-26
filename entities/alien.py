@@ -6,10 +6,10 @@ import config
 class Alien(AnimatedSprite):
     """A class to represent a single alien in the fleet"""
 
-    def __init__(self, ai_settings, alien_type):
+    def __init__(self, stats, alien_type):
         """Initialize the alien and set its starting position"""
         super().__init__(sprite_atlas.aliens[alien_type], sprite_atlas.alien_animation_rate)
-        self.ai_settings = ai_settings
+        self.stats = stats
 
         self.rect = self.image.get_rect()
 
@@ -23,7 +23,7 @@ class Alien(AnimatedSprite):
         super().update(elapsed)
 
         """Move the alien right or left."""
-        self.x += (self.ai_settings.alien_speed * self.ai_settings.fleet_direction * elapsed)
+        self.x += (self.stats.alien_speed * self.stats.fleet_direction * elapsed)
         self.rect.x = self.x
 
     def check_edges(self):

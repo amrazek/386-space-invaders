@@ -6,8 +6,8 @@ import config
 
 
 class AlienFleet:
-    def __init__(self, ai_settings, ship, on_clear_callback, on_kill_callback):
-        self.ai_settings = ai_settings
+    def __init__(self, stats, ship, on_clear_callback, on_kill_callback):
+        self.stats = stats
         self.ship = ship
         self.on_clear = on_clear_callback
         self.on_kill = on_kill_callback
@@ -35,7 +35,7 @@ class AlienFleet:
     def create_new_fleet(self):
         """Create a full fleet of aliens"""
         # Create an alien and find the number of aliens in a row.
-        alien = Alien(self.ai_settings, 0)
+        alien = Alien(self.stats, 0)
         number_aliens_x = self.__get_number_aliens_x(alien.rect.width)
         number_rows = self.__get_number_rows(alien.rect.height)
 
@@ -56,8 +56,8 @@ class AlienFleet:
     def change_fleet_direction(self):
         """Drop the entire fleet and change the fleet's direction."""
         for alien in self.aliens.sprites():
-            alien.rect.y += self.ai_settings.fleet_drop_speed
-        self.ai_settings.fleet_direction *= -1
+            alien.rect.y += config.fleet_drop_speed
+        self.stats.fleet_direction *= -1
 
     @staticmethod
     def __get_number_aliens_x(alien_width):
@@ -77,11 +77,10 @@ class AlienFleet:
     def __create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row"""
         num_types = len(sprite_atlas.aliens)
-        alien = Alien(self.ai_settings, alien_number % num_types)
+        alien = Alien(self.stats, alien_number % num_types)
 
         alien_width = alien.rect.width
         alien.x = alien_width + alien_width * alien_number
-
         alien.rect.y = alien.rect.height + alien.rect.height * row_number
         alien.rect.x = alien.x
 
