@@ -6,9 +6,9 @@ import config
 class Alien(AnimatedSprite):
     """A class to represent a single alien in the fleet"""
 
-    def __init__(self, ai_settings):
+    def __init__(self, ai_settings, alien_type):
         """Initialize the alien and set its starting position"""
-        super().__init__(sprite_atlas.alien, sprite_atlas.alien_animation_rate)
+        super().__init__(sprite_atlas.aliens[alien_type], sprite_atlas.alien_animation_rate)
         self.ai_settings = ai_settings
 
         self.rect = self.image.get_rect()

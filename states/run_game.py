@@ -3,7 +3,7 @@ from settings import Settings
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
 from game_stats import GameStats
-from controllers.alien_fleet import AlienFleet
+from entities.alien_fleet import AlienFleet
 from entities.ship import Ship
 
 
@@ -15,8 +15,8 @@ class RunGame(GameState):
         self.ship = Ship(self.ai_settings)
 
         self.fleet = AlienFleet(self.ai_settings, self.ship,
-                                f_on_clear=self.__on_fleet_destroyed,
-                                f_on_kill=self.__on_alien_killed)
+                                on_clear_callback=self.__on_fleet_destroyed,
+                                on_kill_callback=self.__on_alien_killed)
 
         self.stats = GameStats(self.ai_settings)
         self.scoreboard = Scoreboard(self.ai_settings, self.stats)

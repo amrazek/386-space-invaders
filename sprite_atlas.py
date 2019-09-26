@@ -1,14 +1,25 @@
+import os
 import pygame
 
-alien = None
+alien_images = ["alien1.bmp", "alien2.bmp"]
+
+aliens = []
 alien_animation_rate = 1.0
 
 
 def load_atlas():
-    global alien
+    global aliens
 
-    alien = pygame.image.load("images/alien1.bmp")
-    set_color_key_from_pixel(alien, (0, 0))
+    aliens = [load_image(name) for name in alien_images]
+
+
+def load_image(name, ck_pixel=(0,0)):
+    path = os.path.join("images", name)
+
+    img = pygame.image.load(path)
+    set_color_key_from_pixel(img, ck_pixel)
+
+    return img
 
 
 def set_color_key_from_pixel(image, coord):
