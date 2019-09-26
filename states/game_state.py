@@ -4,14 +4,14 @@ class GameState:
         self.input_state = input_state
 
     def update(self, elapsed):
-        pass
+        raise NotImplementedError
 
     def draw(self, screen):
-        pass
+        raise NotImplementedError
 
     @property
     def finished(self):
-        return True
+        raise NotImplementedError
 
     def get_next(self):
-        return None
+        raise NotImplementedError
