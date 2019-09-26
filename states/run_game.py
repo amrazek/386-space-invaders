@@ -1,4 +1,5 @@
 from states.game_state import GameState
+from states.game_over import GameOver
 from settings import Settings
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
@@ -22,6 +23,7 @@ class RunGame(GameState):
         self.stats = GameStats(self.ai_settings, self.scoreboard)
 
         self.bullets = BulletManager()
+        self.game_over = GameOver(input_state, self)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
@@ -46,7 +48,7 @@ class RunGame(GameState):
         return self.stats.ships_left == 0
 
     def get_next(self):
-        return None
+        return self.game_over
 
     def __player_destroyed(self):
         if self.stats.player_alive:
@@ -61,7 +63,7 @@ class RunGame(GameState):
             self.ship.destroyed = False
 
         else:  # no ships left
-            pass  # TODO
+            pass  # done
 
     def __on_alien_killed(self, alien):
         self.stats.increase_score(self.ai_settings.alien_points)
