@@ -3,7 +3,7 @@ from states.game_over import GameOver
 from settings import Settings
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
-from game_stats import GameStats
+from session_stats import SessionStats
 from entities.alien_fleet import AlienFleet
 from entities.ship import Ship
 
@@ -20,7 +20,7 @@ class RunGame(GameState):
                                 on_kill_callback=self.__on_alien_killed)
 
         self.scoreboard = Scoreboard(self.ai_settings)
-        self.stats = GameStats(self.ai_settings, self.scoreboard)
+        self.stats = SessionStats(self.ai_settings, self.scoreboard)
 
         self.bullets = BulletManager()
         self.game_over = GameOver(input_state, self)

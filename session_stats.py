@@ -1,13 +1,10 @@
-class GameStats:
-    """Track statistics for Space Invaders."""
+class SessionStats:
+    """Track per-session statistics for Space Invaders."""
 
     def __init__(self, ai_settings, scoreboard):
         """Initialize statistics."""
         self.ai_settings = ai_settings
         self.scoreboard = scoreboard
-
-        # Start Alien Invasion in an inactive state
-        self.game_active = False
 
         # init values to make PEP8 happy
         self.ships_left = self.ai_settings.ship_limit
