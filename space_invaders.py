@@ -1,6 +1,7 @@
 import pygame
 import sprite_atlas
 from states.run_game import RunGame
+from states.bunker_test import BunkerTest
 from states.input_state import InputState
 from timer import Timer
 import config
@@ -18,7 +19,8 @@ def run_game():
 
     # init game
     input_state = InputState()
-    game_state = RunGame(input_state)
+    #game_state = RunGame(input_state)
+    game_state = BunkerTest(input_state)
 
     # start main loop for the game
     timer = Timer()
