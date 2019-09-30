@@ -69,7 +69,7 @@ class AlienFleet:
 
     def __get_number_rows(self, alien_height):
         """Determine the number of rows of aliens that fit on the screen"""
-        available_space_y = (config.screen_height - alien_height - 2 * self.ship.rect.height)
+        available_space_y = (config.screen_height - alien_height - 4 * self.ship.rect.height)
         number_rows = int(available_space_y / alien_height)
 
         return number_rows

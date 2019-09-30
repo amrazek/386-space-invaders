@@ -20,6 +20,11 @@ bullets_allowed = 3
 fleet_drop_speed = 30
 initial_point_value = 50
 
+# Bunker settings
+bunker_tile_size = 32
+bunker_count = 3
+bunker_offset_from_ship = 1  # multiplier to ship height
+
 # How quickly the game speeds up
 speedup_scale = 1.1
 

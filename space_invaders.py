@@ -11,7 +11,7 @@ def run_game():
     # initialize PyGame and create screen surface
     pygame.init()
 
-    screen = pygame.display.set_mode((config.screen_width, config.screen_height))
+    screen = pygame.display.set_mode((config.screen_width, config.screen_height), pygame.DOUBLEBUF)
     pygame.display.set_caption("Space Invaders")
 
     # load all animated sprite images needed for the game
@@ -19,8 +19,8 @@ def run_game():
 
     # init game
     input_state = InputState()
-    #game_state = RunGame(input_state)
-    game_state = BunkerTest(input_state)
+    game_state = RunGame(input_state)
+    #game_state = BunkerTest(input_state)
 
     # start main loop for the game
     timer = Timer()

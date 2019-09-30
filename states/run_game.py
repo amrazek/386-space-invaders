@@ -1,3 +1,4 @@
+from pygame.sprite import Group
 from states.game_state import GameState
 from states.game_over import GameOver
 from session_stats import SessionStats
@@ -6,6 +7,8 @@ from entities.bullet import BulletManager
 from session_stats import SessionStats
 from entities.alien_fleet import AlienFleet
 from entities.ship import Ship
+from entities.bunker import Bunker
+import config
 
 
 class RunGame(GameState):
@@ -21,12 +24,14 @@ class RunGame(GameState):
                                 on_kill_callback=self.__on_alien_killed)
 
         self.bullets = BulletManager()
+        self.bunkers = Group(Bunker.create_bunkers(config.bunker_count, self.ship))
         self.game_over = GameOver(input_state, self)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
         self.fleet.update(elapsed, self.bullets)
         self.bullets.update(elapsed)
+        self.bunkers.update(elapsed)
 
         if self.ship.destroyed:
             self.__player_destroyed()
@@ -38,6 +43,7 @@ class RunGame(GameState):
         screen.fill(color=(0, 0, 50))
         screen.blit(self.ship.image, self.ship.rect)
         self.bullets.draw(screen)
+        self.bunkers.draw(screen)
         self.fleet.draw(screen)
         self.scoreboard.draw(screen)
 
