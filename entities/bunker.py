@@ -14,48 +14,55 @@ def generate_bunker_surface():
     surf.fill(bkg)
     surf.set_colorkey(bkg)
 
-    # fill bottoms of legs and center
-    color = (0, 255, 0)
-    r = pygame.Rect(0, 0, tile_size, tile_size)
+    # fill bottom two-thirds of bunker
+    r = surf.get_rect()
+    r.height -= tile_size
+    r.bottom = surf.get_height()
+    surf.fill(config.bunker_color, r)
 
-    # bottom left
-    r.left, r.bottom = 0, wh[1]
-    surf.fill(color, r)
+    # fill top tile between the two "legs"
+    surf.fill(config.bunker_color, pygame.Rect(tile_size, 0, tile_size, tile_size))
 
-    # bottom right
-    r.right = wh[0]
-    surf.fill(color, r)
+    # left circle to create rounded "left shoulder"
+    r.width, r.height = tile_size * 2, tile_size * 2
+    r.center = (tile_size, tile_size)
+    pygame.draw.circle(surf, config.bunker_color, r.center, tile_size)
 
-    # middle brace
-    r.top = 0
-    r.left = config.bunker_tile_size
-    surf.fill(color, r)
+    # right circle
+    r.center = (surf.get_width() - tile_size, r.centery)
+    pygame.draw.circle(surf, config.bunker_color, r.center, tile_size)
 
-    # left and right arcs. we'll borrow another surface drawn with a circle to make this easy
-    circle = pygame.Surface((tile_size * 2, tile_size * 2))
-    circle.fill(bkg)
-    pygame.draw.circle(circle, color, circle.get_rect().center, tile_size)
+    # clip out the bottom square which is not part of the bunker
+    r.width, r.height = tile_size, tile_size
+    r.left, r.bottom = tile_size, surf.get_height()
 
-    # left arc
-    circle_rect = pygame.Rect(0, 0, tile_size, tile_size)
-    r.left, r.top = 0, 0
-    surf.blit(circle, r, circle_rect)
+    surf.fill(bkg, r)
 
-    # right arc
-    r.right = surf.get_rect().width
-    circle_rect.right = tile_size * 2
-    surf.blit(circle, r, circle_rect)
-
-    return surf
+    return surf.convert()
 
 
-class Bunker(Sprite):
+class BunkerFragment(Sprite):
+    def __init__(self, surf, center_position):
+        super().__init__()
+
+        self.image = surf
+        self.rect = surf.get_rect()
+        self.rect.center = center_position
+
+
+class Bunker:
     def __init__(self, center_position):
         super().__init__()
 
-        self.image = generate_bunker_surface()
-        self.rect = self.image.get_rect()
-        self.rect.center = center_position
+        img = generate_bunker_surface()
+
+        self._fragments = pygame.sprite.Group(Bunker._create_bunker_fragments(img, center_position))
+
+    def update(self, elapsed):
+        self._fragments.update(elapsed)
+
+    def draw(self, screen):
+        self._fragments.draw(screen)
 
     @staticmethod
     def create_bunkers(count, ship):
@@ -67,12 +74,36 @@ class Bunker(Sprite):
                 for center in range(spacing, config.screen_width, spacing)]
 
     @classmethod
-    def _slice_bunker_surf(cls, surf):
-        slices = pygame.sprite.Group()
+    def _create_bunker_fragments(cls, surf, bunker_center):
+        fragments = []
+
+        src_rect = pygame.Rect(0, 0, config.bunker_tile_size, config.bunker_tile_size)
+        dest_rect = src_rect.copy()
 
         for x in range(0, surf.get_rect().width, config.bunker_tile_size):
             for y in range(0, surf.get_rect().height, config.bunker_tile_size):
+                slice_surf = pygame.Surface(src_rect.size)
+                slice_surf.blit(surf, dest_rect, src_rect)
+                slice_surf.set_colorkey(config.transparent_color)
 
+                # avoid creating blank slices by making sure the tile has some content
+                threshold = pygame.transform.threshold(None, slice_surf, config.transparent_color, set_behavior=0)
 
+                if threshold < dest_rect.width * dest_rect.height:
+                    r = src_rect.copy()
+                    r.left -= surf.get_width() // 2
+                    r.top -= surf.get_height() // 2
 
+                    r.left += bunker_center[0]
+                    r.top += bunker_center[1]
 
+                    fragment = BunkerFragment(slice_surf, r.center)
+                    fragments.append(fragment)
+
+                src_rect.left += config.bunker_tile_size
+
+                if src_rect.left >= surf.get_width():
+                    src_rect.left = 0
+                    src_rect.top += config.bunker_tile_size
+
+        return fragments

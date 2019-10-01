@@ -24,14 +24,14 @@ class RunGame(GameState):
                                 on_kill_callback=self.__on_alien_killed)
 
         self.bullets = BulletManager()
-        self.bunkers = Group(Bunker.create_bunkers(config.bunker_count, self.ship))
+        self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship)
         self.game_over = GameOver(input_state, self)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
         self.fleet.update(elapsed, self.bullets)
         self.bullets.update(elapsed)
-        self.bunkers.update(elapsed)
+        for bunker in self.bunkers: bunker.update(elapsed)
 
         if self.ship.destroyed:
             self.__player_destroyed()
@@ -43,7 +43,7 @@ class RunGame(GameState):
         screen.fill(color=(0, 0, 50))
         screen.blit(self.ship.image, self.ship.rect)
         self.bullets.draw(screen)
-        self.bunkers.draw(screen)
+        for bunker in self.bunkers: bunker.draw(screen)
         self.fleet.draw(screen)
         self.scoreboard.draw(screen)
 

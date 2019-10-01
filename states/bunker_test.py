@@ -3,6 +3,7 @@ from PIL import Image
 import pygame
 from states.game_state import GameState
 import config
+from entities.bunker import generate_bunker_surface
 
 
 
@@ -20,7 +21,7 @@ class BunkerTest(GameState):
         # fill bunker with green
         # self.bunker.fill((0, 255, 0))
         # self.bunker = self.bunker.convert_alpha()
-        self.bunker = generate_bunker(32)
+        self.bunker = generate_bunker_surface()
 
         self.bunker_pil = self.bunker.copy()
         self.bunker_pil_rect = self.bunker_rect.copy()

@@ -6,6 +6,7 @@ screen_height = 600
 bg_color = (0, 0, 0)
 text_color = (255, 255, 255)
 screen_rect = Rect(0, 0, screen_width, screen_height)
+transparent_color = (0, 0, 0)
 
 # ship settings
 ship_limit = 3
@@ -24,6 +25,7 @@ initial_point_value = 50
 bunker_tile_size = 32
 bunker_count = 3
 bunker_offset_from_ship = 1  # multiplier to ship height
+bunker_color = (0, 255, 0)
 
 # How quickly the game speeds up
 speedup_scale = 1.1
