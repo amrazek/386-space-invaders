@@ -1,3 +1,4 @@
+import random
 import pygame
 from pygame.sprite import Sprite
 import config
@@ -50,15 +51,53 @@ class BunkerFragment(Sprite):
         self.rect.center = center_position
         self.health = config.bunker_fragment_health
 
+        # note: since some fragments are not entirely filled, we need to get number of actual pixels
+        # that are not transparent and use that to determine dissolve parameters
+        color_key_color = surf.get_colorkey()
+
+        assert color_key_color is not None
+
+        transparent_num_pixels = pygame.transform.threshold(None, surf, color_key_color, set_behavior=0,
+                                                            inverse_set=True)
+
+        num_pixels = surf.get_width() * surf.get_height() - transparent_num_pixels
+
+        self._num_pixels_per_dissolve = num_pixels // self.health if self.health > 0 else num_pixels
+
     @property
     def dead(self):
         return self.health == 0
 
-    def damage(self, bullet):
+    def damage(self):
         self.health -= 1
 
         # apply damage effect to this section
-        self.image.set_alpha(255 // 3 * self.health)
+        if self.health <= 0:
+            self.image.set_alpha(0)
+            return
+
+        pixels = pygame.PixelArray(self.image)  # will lock surface, if required
+
+        num_pixels = self._num_pixels_per_dissolve
+        transparent_color = self.image.get_colorkey()
+        w, h = self.image.get_width(), self.image.get_height()
+        mapped_transparent_color = self.image.map_rgb(transparent_color)
+
+        while num_pixels > 0:
+            # randomly choose a location
+            x, y = random.randrange(0, w), random.randrange(0, h)
+
+            # make sure that pixel isn't already transparent
+            current_color = pixels[x, y]
+
+            if current_color == transparent_color:
+                continue
+
+            pixels[x, y] = mapped_transparent_color
+            num_pixels -= 1
+
+        pixels.close()
+
 
 class Bunker:
     def __init__(self, center_position):
@@ -66,10 +105,8 @@ class Bunker:
 
         img = generate_bunker_surface()
 
-        self._fragments = pygame.sprite.Group(Bunker._create_bunker_fragments(img, center_position))
-
-        # temp: apply damage to top-left fragment
-        self._fragments[0].damage(None)
+        fragments = Bunker._create_bunker_fragments(img, center_position)
+        self._fragments = pygame.sprite.Group(fragments)
 
     def update(self, elapsed):
         self._fragments.update(elapsed)
