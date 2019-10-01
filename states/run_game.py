@@ -31,7 +31,8 @@ class RunGame(GameState):
         self.ship.update(self.input_state, elapsed)
         self.fleet.update(elapsed, self.bullets)
         self.bullets.update(elapsed)
-        for bunker in self.bunkers: bunker.update(elapsed)
+        for bunker in self.bunkers:
+            bunker.update(elapsed)
 
         if self.ship.destroyed:
             self.__player_destroyed()
@@ -67,7 +68,7 @@ class RunGame(GameState):
             self.ship.destroyed = False
 
         else:  # no ships left
-            pass  # done
+            pass  # done TODO
 
         self.scoreboard.set_dirty()
 
@@ -81,5 +82,4 @@ class RunGame(GameState):
 
         # clear all bullets
         self.bullets.clear()
-
         self.scoreboard.set_dirty()

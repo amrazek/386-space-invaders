@@ -26,6 +26,7 @@ bunker_tile_size = 32
 bunker_count = 3
 bunker_offset_from_ship = 1  # multiplier to ship height
 bunker_color = (0, 255, 0)
+bunker_fragment_health = 3
 
 # How quickly the game speeds up
 speedup_scale = 1.1

@@ -48,7 +48,17 @@ class BunkerFragment(Sprite):
         self.image = surf
         self.rect = surf.get_rect()
         self.rect.center = center_position
+        self.health = config.bunker_fragment_health
 
+    @property
+    def dead(self):
+        return self.health == 0
+
+    def damage(self, bullet):
+        self.health -= 1
+
+        # apply damage effect to this section
+        self.image.set_alpha(255 // 3 * self.health)
 
 class Bunker:
     def __init__(self, center_position):
@@ -57,6 +67,9 @@ class Bunker:
         img = generate_bunker_surface()
 
         self._fragments = pygame.sprite.Group(Bunker._create_bunker_fragments(img, center_position))
+
+        # temp: apply damage to top-left fragment
+        self._fragments[0].damage(None)
 
     def update(self, elapsed):
         self._fragments.update(elapsed)
