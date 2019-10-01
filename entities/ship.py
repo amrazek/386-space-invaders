@@ -5,11 +5,12 @@ from entities.bullet import Bullet
 
 
 class Ship(Sprite):
-    def __init__(self, stats):
+    def __init__(self, stats, bullet_manager):
         """Initialize ship and set its starting position"""
         super().__init__()
 
         self.stats = stats
+        self.bullet_manager = bullet_manager
 
         # load the ship image and get its rect
         self.image = pygame.image.load("images/ship.bmp")
@@ -48,10 +49,9 @@ class Ship(Sprite):
     def hit(self):
         self.destroyed = True
 
-    def fire(self, bullet_manager):
+    def fire(self):
         current_tick = pygame.time.get_ticks()
 
         if current_tick - self.last_shot >= self.min_time_between_shots:
             self.last_shot = current_tick
-            bullet = Bullet(self.stats, self)
-            bullet_manager.add(bullet)
+            self.bullet_manager.create(self)

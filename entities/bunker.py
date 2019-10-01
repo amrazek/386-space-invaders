@@ -100,27 +100,48 @@ class BunkerFragment(Sprite):
 
 
 class Bunker:
-    def __init__(self, center_position):
+    def __init__(self, center_position, player_bullets, enemy_bullets):
         super().__init__()
 
         img = generate_bunker_surface()
 
         fragments = Bunker._create_bunker_fragments(img, center_position)
         self._fragments = pygame.sprite.Group(fragments)
+        self._bullets = [player_bullets, enemy_bullets]
 
     def update(self, elapsed):
         self._fragments.update(elapsed)
+
+        # check for collisions with any bullets
+        for bullet_mgr in self._bullets:
+            collisions = pygame.sprite.groupcollide(self._fragments, bullet_mgr, False, True)
+
+            for pair in collisions.items():
+                fragment = pair[0]
+                bullets = pair[1]  # a list of hits
+
+                for _ in bullets:
+                    fragment.damage()
+
+                    if fragment.dead:
+                        break
+
+            if len(collisions) > 0:
+                # remove any dead fragments
+                for fragment in self._fragments.copy():
+                    if fragment.dead:
+                        self._fragments.remove(fragment)
 
     def draw(self, screen):
         self._fragments.draw(screen)
 
     @staticmethod
-    def create_bunkers(count, ship):
+    def create_bunkers(count, ship, player_bullets, enemy_bullets):
         # create [count] evenly-spaced bunkers
         spacing = config.screen_width // (count + 1)
         bottom = config.screen_height - int(ship.rect.height * config.bunker_offset_from_ship)
 
-        return [Bunker((center, bottom - config.bunker_tile_size * 2))
+        return [Bunker((center, bottom - config.bunker_tile_size * 2), player_bullets, enemy_bullets)
                 for center in range(spacing, config.screen_width, spacing)]
 
     @classmethod

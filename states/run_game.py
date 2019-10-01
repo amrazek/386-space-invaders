@@ -3,7 +3,8 @@ from states.game_state import GameState
 from states.game_over import GameOver
 from session_stats import SessionStats
 from entities.scoreboard import Scoreboard
-from entities.bullet import BulletManager
+from entities.bullet import PlayerBulletManager
+from entities.bullet import EnemyBulletManager
 from session_stats import SessionStats
 from entities.alien_fleet import AlienFleet
 from entities.ship import Ship
@@ -17,34 +18,47 @@ class RunGame(GameState):
         super().__init__(input_state)
 
         self.stats = SessionStats()
-        self.ship = Ship(self.stats)
+
+        self.player_bullets = PlayerBulletManager(self.stats)
+        self.enemy_bullets = EnemyBulletManager(self.stats)
+
+        self.ship = Ship(self.stats, self.player_bullets)
+
         self.scoreboard = Scoreboard(self.stats)
         self.fleet = AlienFleet(self.stats, self.ship,
-                                on_clear_callback=self.__on_fleet_destroyed,
-                                on_kill_callback=self.__on_alien_killed)
+                                on_clear_callback=self._on_fleet_destroyed,
+                                on_kill_callback=self._on_alien_killed)
 
-        self.bullets = BulletManager()
-        self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship)
+        self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.enemy_bullets)
+
         self.game_over = GameOver(input_state, self)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
-        self.fleet.update(elapsed, self.bullets)
-        self.bullets.update(elapsed)
+        self.fleet.update(elapsed, self.player_bullets)
+
+        self.player_bullets.update(elapsed)
+        self.enemy_bullets.update(elapsed)
+
         for bunker in self.bunkers:
             bunker.update(elapsed)
 
         if self.ship.destroyed:
-            self.__player_destroyed()
+            self._player_destroyed()
 
         if self.input_state.fire:
-            self.ship.fire(self.bullets)
+            self.ship.fire()
 
     def draw(self, screen):
         screen.fill(color=(0, 0, 50))
         screen.blit(self.ship.image, self.ship.rect)
-        self.bullets.draw(screen)
-        for bunker in self.bunkers: bunker.draw(screen)
+
+        self.player_bullets.draw(screen)
+        self.enemy_bullets.draw(screen)
+
+        for bunker in self.bunkers:
+            bunker.draw(screen)
+
         self.fleet.draw(screen)
         self.scoreboard.draw(screen)
 
@@ -55,7 +69,7 @@ class RunGame(GameState):
     def get_next(self):
         return self.game_over
 
-    def __player_destroyed(self):
+    def _player_destroyed(self):
         if self.stats.player_alive:
             # Reduce player lives
             self.stats.decrease_lives()
@@ -72,14 +86,17 @@ class RunGame(GameState):
 
         self.scoreboard.set_dirty()
 
-    def __on_alien_killed(self, alien):
+    def _on_alien_killed(self, alien):
         self.stats.increase_score(self.stats.alien_points)
         self.scoreboard.set_dirty()
 
-    def __on_fleet_destroyed(self):
+    def _on_fleet_destroyed(self):
         # advance to next level
         self.stats.increase_level()
 
         # clear all bullets
-        self.bullets.clear()
+        self.player_bullets.clear()
+        self.enemy_bullets.clear()
+
+        # reset scoreboard
         self.scoreboard.set_dirty()
