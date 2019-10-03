@@ -1,4 +1,18 @@
+from pygame import Color
 from pygame import Rect
+from typing import NamedTuple
+
+
+class BulletStats(NamedTuple):
+    width: int
+    height: int
+    speed: float
+    color: Color
+
+    @property
+    def size(self):
+        return self.width, self.height
+
 
 # Screen settings
 screen_width = 1000
@@ -12,13 +26,23 @@ transparent_color = (0, 0, 0)
 ship_limit = 3
 
 # bullet settings
-bullet_width = 3000
-bullet_height = 15
-bullet_color = 60, 60, 60
+default_player_bullet = BulletStats(
+    width=30,
+    height=15,
+    speed=300.0,
+    color=Color('white'))
+
 bullets_allowed = 3
 
+# alien bullet settings
+default_alien_bullet = BulletStats(
+    width=24,
+    height=16,
+    speed=-100.0,
+    color=Color(0, 255, 0))
+
 # Alien settings
-fleet_drop_speed = 30
+fleet_drop_speed = 0
 initial_point_value = 50
 
 # Bunker settings

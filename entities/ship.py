@@ -34,10 +34,10 @@ class Ship(Sprite):
         # update ship's position, not its rect
         if input_state.left ^ input_state.right:
             if input_state.right and self.rect.right < self.screen_rect.right:
-                self.center += self.ai_settings.ship_speed * elapsed
+                self.center += self.stats.ship_speed * elapsed
 
             if input_state.left and self.rect.left > 0:
-                self.center -= self.ai_settings.ship_speed * elapsed
+                self.center -= self.stats.ship_speed * elapsed
 
         # Update rect object from self.center.y
         self.rect.centerx = self.center

@@ -1,46 +1,70 @@
 from abc import abstractmethod
 import pygame
 from pygame.sprite import Sprite, Group
+from config import BulletStats
 import config
+
+
+def generate_alien_bullet(wh, color):
+    surf = pygame.Surface(wh)
+    surf.set_colorkey(config.transparent_color)
+
+    num_vertical_zigzags = 3
+    left_side = True
+    previous_location = (0, 0)
+
+    for y in range(0, surf.get_height(), num_vertical_zigzags):
+        next_location = (0 if left_side else surf.get_width(), y)
+        pygame.draw.aaline(surf, color, previous_location, next_location)
+        previous_location = next_location
+
+    return surf
 
 
 class Bullet(Sprite):
     """A class to manage bullets fired from the ship"""
 
-    def __init__(self, stats, top_left_pos):
+    def __init__(self, bullet_stats: BulletStats, top_left_pos):
         """Create a bullet object at the ship's current position"""
         super().__init__()
 
         # Create a bullet rect at (0, 0) and then set correct position
-        self.rect = pygame.Rect(0, 0, config.bullet_width,
-                                config.bullet_height)
+        self.rect = pygame.Rect(0, 0, bullet_stats.width, bullet_stats.height)
         self.rect.center = top_left_pos
 
         # Store the bullet's position as a decimal value
         self.y = float(self.rect.y)
 
-        self.color = config.bullet_color
-        self.speed_factor = stats.bullet_speed
+        self.color = bullet_stats.color
+        self.speed = bullet_stats.speed
 
-        self.image = pygame.Surface((config.bullet_width, config.bullet_height))
+        self.image = pygame.Surface(self.rect.size)
         self.image.fill(color=self.color)
 
     def update(self, elapsed):
         """Move the bullet up the screen"""
         # Update the decimal position of the bullet
-        self.y -= self.speed_factor * elapsed
+        self.y -= self.speed * elapsed
 
         # Update the rect position
         self.rect.y = self.y
 
 
 class BulletManager:
-    def __init__(self):
+    def __init__(self, bullet_stats: BulletStats):
         self._bullets = Group()
+        self._bullet_stats = bullet_stats
 
-    @abstractmethod
-    def create(self, spawner):
-        pass
+    def create(self, spawn_entity):
+        # spawn the bullet at the center of the spawner, aligned such that it is just about
+        # to leave the spawner's rect
+        bullet_size = self._bullet_stats.size
+
+        location = (spawn_entity.rect.centerx,
+                    spawn_entity.rect.top if self._bullet_stats.speed > 0 else spawn_entity.rect.bottom - bullet_size[1])
+
+        bullet = Bullet(self._bullet_stats, location)
+        self._bullets.add(bullet)
 
     def update(self, elapsed):
         self._bullets.update(elapsed)
@@ -63,17 +87,29 @@ class BulletManager:
         return self._bullets.__iter__()
 
 
-class PlayerBulletManager(BulletManager):
-    def __init__(self, stats):
-        super().__init__()
-        self.stats = stats
+# class PlayerBulletManager(BulletManager):
+#     def __init__(self, bullet_stats: BulletSettings):
+#         super().__init__()
+#         self.bullet_stats = bullet_stats
+#
+#     def create(self, spawner):
+#         # spawn the bullet at the center of the spawner, aligned such that it is just about
+#         # to leave the spawner's rect
+#         bullet_size = self.bullet_stats.size
+#
+#         location = (spawner.rect.centerx,
+#                     spawner.rect.top if self.bullet_stats.speed > 0 else spawner.rect.bottom - bullet_size[1])
+#
+#         bullet = Bullet(self.bullet_stats, location)
+#         self._bullets.add(bullet)
 
-    def create(self, ship):
-        location = (ship.rect.centerx, ship.rect.top)
 
-        bullet = Bullet(self.stats, location)
-        self._bullets.add(bullet)
-
-
-class EnemyBulletManager(PlayerBulletManager):  # todo: implement enemy bullets
-    pass
+# class AlienBulletManager(PlayerBulletManager):
+#     def create(self, alien):
+#         alien_bullet = self.stats.alien_bullet
+#         location = (alien.rect.centerx, alien.rect.bottom)
+#
+#         bullet = Bullet(self.stats.alien_bullet, location)
+#         bullet.image = generate_alien_bullet(alien_bullet.size, config.alien_bullet_color)
+#
+#         self._bullets.add(bullet)

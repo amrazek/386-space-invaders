@@ -3,8 +3,9 @@ from states.game_state import GameState
 from states.game_over import GameOver
 from session_stats import SessionStats
 from entities.scoreboard import Scoreboard
-from entities.bullet import PlayerBulletManager
-from entities.bullet import EnemyBulletManager
+from entities.bullet import BulletManager
+# from entities.bullet import PlayerBulletManager
+# from entities.bullet import AlienBulletManager
 from session_stats import SessionStats
 from entities.alien_fleet import AlienFleet
 from entities.ship import Ship
@@ -19,26 +20,26 @@ class RunGame(GameState):
 
         self.stats = SessionStats()
 
-        self.player_bullets = PlayerBulletManager(self.stats)
-        self.enemy_bullets = EnemyBulletManager(self.stats)
+        self.player_bullets = BulletManager(self.stats.player_bullet)
+        self.alien_bullets = BulletManager(self.stats.alien_bullet)
 
         self.ship = Ship(self.stats, self.player_bullets)
 
         self.scoreboard = Scoreboard(self.stats)
-        self.fleet = AlienFleet(self.stats, self.ship,
+        self.fleet = AlienFleet(self.stats, self.ship, self.alien_bullets,
                                 on_clear_callback=self._on_fleet_destroyed,
                                 on_kill_callback=self._on_alien_killed)
 
-        self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.enemy_bullets)
+        self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.alien_bullets)
 
         self.game_over = GameOver(input_state, self)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
-        self.fleet.update(elapsed, self.player_bullets)
+        self.fleet.update(elapsed, self.player_bullets, self.alien_bullets)
 
         self.player_bullets.update(elapsed)
-        self.enemy_bullets.update(elapsed)
+        self.alien_bullets.update(elapsed)
 
         for bunker in self.bunkers:
             bunker.update(elapsed)
@@ -54,7 +55,7 @@ class RunGame(GameState):
         screen.blit(self.ship.image, self.ship.rect)
 
         self.player_bullets.draw(screen)
-        self.enemy_bullets.draw(screen)
+        self.alien_bullets.draw(screen)
 
         for bunker in self.bunkers:
             bunker.draw(screen)
@@ -96,7 +97,7 @@ class RunGame(GameState):
 
         # clear all bullets
         self.player_bullets.clear()
-        self.enemy_bullets.clear()
+        self.alien_bullets.clear()
 
         # reset scoreboard
         self.scoreboard.set_dirty()

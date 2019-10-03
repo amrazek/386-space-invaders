@@ -23,3 +23,6 @@ class Timer:
     @property
     def elapsed(self):
         return self._elapsed
+
+
+game_timer = Timer()

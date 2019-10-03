@@ -3,7 +3,7 @@ import sprite_atlas
 from states.run_game import RunGame
 from states.bunker_test import BunkerTest
 from states.input_state import InputState
-from timer import Timer
+from timer import game_timer
 import config
 
 
@@ -23,15 +23,13 @@ def run_game():
     #game_state = BunkerTest(input_state)
 
     # start main loop for the game
-    timer = Timer()
-
     while not input_state.quit and game_state is not None:
         input_state.do_events()
-        game_state.update(timer.elapsed)
+        game_state.update(game_timer.elapsed)
         game_state.draw(screen)
         pygame.display.flip()
 
-        timer.update()
+        game_timer.update()
 
         if game_state.finished:
             game_state = game_state.get_next()

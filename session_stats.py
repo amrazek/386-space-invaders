@@ -1,4 +1,5 @@
 import config
+from copy import deepcopy
 
 
 class SessionStats:
@@ -21,6 +22,9 @@ class SessionStats:
         self.level, self.score = 0, 0
         self.ships_left = config.ship_limit
         self.alien_points = config.initial_point_value  # points per alien killed
+
+        self.player_bullet = deepcopy(config.default_player_bullet)
+        self.alien_bullet = deepcopy(config.default_alien_bullet)
 
     def set_level(self, level):
         self.level = level
@@ -52,3 +56,5 @@ class SessionStats:
         self.bullets_per_second *= config.speedup_scale
         self.alien_speed *= config.speedup_scale
         self.alien_points = int(self.alien_points * config.score_scale)
+
+        # todo: increase alien bullet speed, drop rate, etc?

@@ -6,15 +6,19 @@ import config
 
 
 class AlienFleet:
-    def __init__(self, stats, ship, on_clear_callback, on_kill_callback):
+    def __init__(self, stats, ship, alien_bullets, on_clear_callback, on_kill_callback):
         self.stats = stats
         self.ship = ship
+        self.alien_bullets = alien_bullets
         self.on_clear = on_clear_callback
         self.on_kill = on_kill_callback
         self.aliens = Group()
         self.create_new_fleet()
 
-    def update(self, elapsed, player_bullets):
+        # temp
+        self.bullet_elapsed = 0.0
+
+    def update(self, elapsed, player_bullets, alien_bullets):
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
         self.__check_fleet_edges()
         self.aliens.update(elapsed)
@@ -28,6 +32,21 @@ class AlienFleet:
 
         # Look for player bullet->alien collisions
         self.__check_bullet_alien_collisions(player_bullets)
+
+        # todo: fix case where aliens spawn outside screen
+        for alien in self.aliens:
+            if alien.rect.right > config.screen_width:
+                print("warning: alien spawned outside screen at {}".format(alien.rect.right))
+                break
+
+        # *** temp  ***
+        self.bullet_elapsed += elapsed
+
+        if self.bullet_elapsed > 1.0:
+            self.bullet_elapsed -= 1.0
+            # temp: create bullet from every alien
+            for alien in self.aliens:
+                alien_bullets.create(alien)
 
     def draw(self, screen):
         self.aliens.draw(screen)
