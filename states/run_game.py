@@ -1,11 +1,7 @@
-from pygame.sprite import Group
 from states.game_state import GameState
 from states.game_over import GameOver
-from session_stats import SessionStats
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
-# from entities.bullet import PlayerBulletManager
-# from entities.bullet import AlienBulletManager
 from session_stats import SessionStats
 from entities.alien_fleet import AlienFleet
 from entities.ship import Ship
@@ -26,9 +22,10 @@ class RunGame(GameState):
         self.ship = Ship(self.stats, self.player_bullets)
 
         self.scoreboard = Scoreboard(self.stats)
-        self.fleet = AlienFleet(self.stats, self.ship, self.alien_bullets,
+        self.fleet = AlienFleet(self.stats, self.ship, self.player_bullets, self.alien_bullets,
                                 on_clear_callback=self._on_fleet_destroyed,
-                                on_kill_callback=self._on_alien_killed)
+                                on_kill_callback=self._on_alien_killed,
+                                on_player_collision_callback=self._player_destroyed)
 
         self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.alien_bullets)
 
@@ -36,16 +33,13 @@ class RunGame(GameState):
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
-        self.fleet.update(elapsed, self.player_bullets, self.alien_bullets)
+        self.fleet.update(elapsed)
 
         self.player_bullets.update(elapsed)
         self.alien_bullets.update(elapsed)
 
         for bunker in self.bunkers:
             bunker.update(elapsed)
-
-        if self.ship.destroyed:
-            self._player_destroyed()
 
         if self.input_state.fire:
             self.ship.fire()
@@ -72,6 +66,8 @@ class RunGame(GameState):
 
     def _player_destroyed(self):
         if self.stats.player_alive:
+            print("Player was destroyed")
+
             # Reduce player lives
             self.stats.decrease_lives()
 
@@ -80,10 +76,9 @@ class RunGame(GameState):
 
             # reset player position and state
             self.ship.center_ship()
-            self.ship.destroyed = False
 
         else:  # no ships left
-            pass  # done TODO
+            pass  # done TODO: prepare transition to next state
 
         self.scoreboard.set_dirty()
 

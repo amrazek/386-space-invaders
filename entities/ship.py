@@ -1,7 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
 import config
-from entities.bullet import Bullet
 
 
 class Ship(Sprite):
@@ -13,7 +12,7 @@ class Ship(Sprite):
         self.bullet_manager = bullet_manager
 
         # load the ship image and get its rect
-        self.image = pygame.image.load("images/ship.bmp")
+        self.image = pygame.image.load("images/ship.bmp")  # todo: use a sprite sheet instead of loading every time
 
         self.rect = self.image.get_rect()
         self.screen_rect = pygame.Rect(0, 0, config.screen_width, config.screen_height)
@@ -24,8 +23,6 @@ class Ship(Sprite):
 
         # store a decimal for the ship's position
         self.center = float(self.rect.centerx)
-
-        self.destroyed = False
 
         self.last_shot = 0
         self.min_time_between_shots = round(1000.0 / stats.bullets_per_second)
@@ -45,9 +42,6 @@ class Ship(Sprite):
     def center_ship(self):
         """Center the ship on the screen"""
         self.center = self.screen_rect.centerx
-
-    def hit(self):
-        self.destroyed = True
 
     def fire(self):
         current_tick = pygame.time.get_ticks()

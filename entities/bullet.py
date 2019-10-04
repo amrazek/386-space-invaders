@@ -1,4 +1,3 @@
-from abc import abstractmethod
 import pygame
 from pygame.sprite import Sprite, Group
 from config import BulletStats
@@ -85,31 +84,3 @@ class BulletManager:
 
     def __iter__(self):
         return self._bullets.__iter__()
-
-
-# class PlayerBulletManager(BulletManager):
-#     def __init__(self, bullet_stats: BulletSettings):
-#         super().__init__()
-#         self.bullet_stats = bullet_stats
-#
-#     def create(self, spawner):
-#         # spawn the bullet at the center of the spawner, aligned such that it is just about
-#         # to leave the spawner's rect
-#         bullet_size = self.bullet_stats.size
-#
-#         location = (spawner.rect.centerx,
-#                     spawner.rect.top if self.bullet_stats.speed > 0 else spawner.rect.bottom - bullet_size[1])
-#
-#         bullet = Bullet(self.bullet_stats, location)
-#         self._bullets.add(bullet)
-
-
-# class AlienBulletManager(PlayerBulletManager):
-#     def create(self, alien):
-#         alien_bullet = self.stats.alien_bullet
-#         location = (alien.rect.centerx, alien.rect.bottom)
-#
-#         bullet = Bullet(self.stats.alien_bullet, location)
-#         bullet.image = generate_alien_bullet(alien_bullet.size, config.alien_bullet_color)
-#
-#         self._bullets.add(bullet)

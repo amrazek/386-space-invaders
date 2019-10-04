@@ -6,32 +6,39 @@ import config
 
 
 class AlienFleet:
-    def __init__(self, stats, ship, alien_bullets, on_clear_callback, on_kill_callback):
+    def __init__(self, stats, ship, player_bullets, alien_bullets,
+                 on_clear_callback, on_kill_callback, on_player_collision_callback):
         self.stats = stats
         self.ship = ship
+        self.player_bullets = player_bullets
         self.alien_bullets = alien_bullets
         self.on_clear = on_clear_callback
         self.on_kill = on_kill_callback
+        self.on_player_collision = on_player_collision_callback
         self.aliens = Group()
         self.create_new_fleet()
 
         # temp
-        self.bullet_elapsed = 0.0
+        self.bullet_elapsed = 999.0
 
-    def update(self, elapsed, player_bullets, alien_bullets):
+    def update(self, elapsed):
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
         self.__check_fleet_edges()
         self.aliens.update(elapsed)
 
         # Look for alien-ship collisions
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            self.ship.hit()
+            self.on_player_collision()
 
         # Look for aliens hitting the bottom of the screen
-        self.__check_aliens_bottom()
+        self._check_aliens_bottom()
 
         # Look for player bullet->alien collisions
-        self.__check_bullet_alien_collisions(player_bullets)
+        self._check_bullet_alien_collisions(self.player_bullets)
+
+        # Look for alien bullet->ship collisions
+        if pygame.sprite.spritecollideany(self.ship, self.alien_bullets):
+            self.on_player_collision()
 
         # todo: fix case where aliens spawn outside screen
         for alien in self.aliens:
@@ -42,11 +49,8 @@ class AlienFleet:
         # *** temp  ***
         self.bullet_elapsed += elapsed
 
-        if self.bullet_elapsed > 1.0:
-            self.bullet_elapsed -= 1.0
-            # temp: create bullet from every alien
-            for alien in self.aliens:
-                alien_bullets.create(alien)
+        if self.bullet_elapsed > 5.0:
+            self._fire_alien_bullet()
 
     def draw(self, screen):
         self.aliens.draw(screen)
@@ -55,15 +59,15 @@ class AlienFleet:
         """Create a full fleet of aliens"""
         # Create an alien and find the number of aliens in a row.
         alien = Alien(self.stats, 0)
-        number_aliens_x = self.__get_number_aliens_x(alien.rect.width)
-        number_rows = self.__get_number_rows(alien.rect.height)
+        number_aliens_x = self._get_number_aliens_x(alien.rect.width)
+        number_rows = self._get_number_rows(alien.rect.height)
 
         self.aliens.empty()
 
         # Create the first row of aliens
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
-                self.__create_alien(alien_number, row_number)
+                self._create_alien(alien_number, row_number)
 
     def __check_fleet_edges(self):
         """Respond appropriately if any aliens have reached an edge."""
@@ -79,21 +83,21 @@ class AlienFleet:
         self.stats.fleet_direction *= -1
 
     @staticmethod
-    def __get_number_aliens_x(alien_width):
+    def _get_number_aliens_x(alien_width):
         """Determine the number of aliens that fit in a row"""
         available_space_x = config.screen_width - 2 * alien_width
         number_aliens_x = int(available_space_x / alien_width)
 
         return number_aliens_x
 
-    def __get_number_rows(self, alien_height):
+    def _get_number_rows(self, alien_height):
         """Determine the number of rows of aliens that fit on the screen"""
         available_space_y = (config.screen_height - alien_height - 4 * self.ship.rect.height)
         number_rows = int(available_space_y / alien_height)
 
         return number_rows
 
-    def __create_alien(self, alien_number, row_number):
+    def _create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row"""
         num_types = len(sprite_atlas.aliens)
         alien = Alien(self.stats, alien_number % num_types)
@@ -105,7 +109,7 @@ class AlienFleet:
 
         self.aliens.add(alien)
 
-    def __check_aliens_bottom(self):
+    def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= config.screen_height:
@@ -113,7 +117,7 @@ class AlienFleet:
                 self.ship.hit()
                 break
 
-    def __check_bullet_alien_collisions(self, bullets):
+    def _check_bullet_alien_collisions(self, bullets):
         """Respond to bullet-alien collisions."""
         # Remove any bullets and aliens that have collided
         collisions = pygame.sprite.groupcollide(bullets, self.aliens, True, True)
@@ -127,3 +131,12 @@ class AlienFleet:
             # If the entire fleet is destroyed, start a new level
             self.on_clear()
             self.create_new_fleet()
+
+    def _fire_alien_bullet(self):
+        self.bullet_elapsed = 0.0
+
+        # *** temp  ***
+
+        # temp: create bullet from every alien
+        for alien in self.aliens:
+            self.alien_bullets.create(alien)
