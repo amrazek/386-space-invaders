@@ -8,7 +8,6 @@ class SessionStats:
     def __init__(self):
         """Initialize statistics."""
         self.ship_speed = 450       # pixels per second
-        self.bullet_speed = 600
         self.alien_speed = 100
         self.bullets_per_second = 5
 

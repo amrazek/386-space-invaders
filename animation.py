@@ -15,6 +15,8 @@ class Animation:
         self.current_frame = frames[0]
         self.masks = masks
         self.current_mask = self.masks[0] if self.masks else None
+        self.width = frames[0].get_width()
+        self.height = frames[0].get_height()
 
     @property
     def duration(self):
@@ -31,9 +33,23 @@ class Animation:
 
         while self.accumulator >= self._time_per_frame:
             self.accumulator -= self._time_per_frame
-            self.current_frame_index = (self.current_frame_index + 1) % self.frame_count
-            self.current_frame = self.frames[self.current_frame_index]
-            self.current_mask = self.masks[self.current_frame_index] if self.masks else None
+            self.next_frame()
+
+    @property
+    def frame(self):
+        return self.current_frame_index
+
+    @frame.setter
+    def frame(self, idx):
+        assert 0 <= idx < self.frame_count
+        self.current_frame_index = idx
+        self.current_frame = self.frames[idx]
+
+    def next_frame(self):
+        cur = self.frame + 1
+
+        self.frame = cur if cur < self.frame_count else 0
+        self.current_mask = self.masks[self.frame] if self.masks else None
 
     @property
     def image(self):
@@ -42,3 +58,19 @@ class Animation:
     @property
     def mask(self):
         return self.current_mask
+
+
+class StaticAnimation(Animation):
+    def __init__(self, frames, mask=None):
+        # quietly convert parameters to lists if needed. This allows this class to be a truly static "animation"
+        # (such that frames are manipulated manually) or actually just a one-frame not-actually-animated thing, which
+        # can be interchangeably used anywhere Animation is
+        if not isinstance(frames, list):
+            frames = [frames]
+        if mask is not None and not isinstance(mask, list):
+            mask = [mask]
+
+        super().__init__(frames, 0.0, mask)
+
+    def update(self, elapsed):
+        pass

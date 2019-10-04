@@ -1,6 +1,7 @@
 import pygame
 from pygame.sprite import Group
 from entities.alien import Alien
+from entities.bullet import Bullet
 import config
 
 
@@ -51,7 +52,7 @@ class AlienFleet:
         self.bullet_elapsed += elapsed
 
         if self.bullet_elapsed > 5.0:
-            self._fire_alien_bullet()
+            self._fire_alien_bullet(None)
 
     def draw(self, screen):
         self.aliens.draw(screen)
@@ -134,11 +135,22 @@ class AlienFleet:
             self.on_clear()
             self.create_new_fleet()
 
-    def _fire_alien_bullet(self):
+    def _fire_alien_bullet(self, alien):
         self.bullet_elapsed = 0.0
 
         # *** temp  ***
 
         # temp: create bullet from every alien
         for alien in self.aliens:
-            self.alien_bullets.create(alien)
+            # create new animation for this bullet
+            bullet_anim = config.atlas.load_animation("alien_bullet")
+
+            # calculate bullet center position
+            # it should align with the BOTTOM of the alien
+            r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)
+            r.bottom = alien.rect.bottom
+            r.centerx = alien.rect.centerx
+
+            bullet = Bullet(self.stats.alien_bullet, r.center, bullet_anim)
+
+            self.alien_bullets.add(bullet)

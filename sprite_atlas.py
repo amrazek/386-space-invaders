@@ -2,6 +2,7 @@ import os
 import copy
 import pygame
 from animation import Animation
+from animation import StaticAnimation
 import config
 
 
@@ -9,15 +10,38 @@ def load_atlas():
     atlas = SpriteAtlas(os.path.join('images', 'atlas.png'))
 
     atlas.initialize_static("ship", color_key=config.transparent_color, generate_mask=True)
+    atlas.initialize_static("player_bullet", color_key=config.transparent_color, generate_mask=True)
     atlas.initialize_animation("alien1", 64, 64, 5, color_key=config.transparent_color)
     atlas.initialize_animation("alien2", 64, 64, 1, color_key=config.transparent_color)
 
-    from entities.bullet import generate_alien_bullet
+    frames = generate_alien_bullet_frames(config.default_alien_bullet.size, config.default_alien_bullet.color)
 
-    #atlas.statics["alien_bullet"] = generate_alien_bullet((20, 20), color=(0, 0, 255))
-    atlas.initialize_static_from_surface("alien_bullet", generate_alien_bullet((20, 20), color=(0, 0, 255)), True)
-
+    atlas.initialize_animation_from_frames("alien_bullet", frames, 0.5, generate_masks=True)
     config.atlas = atlas
+
+
+def generate_alien_bullet_frames(wh, color):
+    num_vertical_zigzags = 5
+
+    previous_location = (0, 0)
+
+    frames = []
+
+    for start_side in [True, False]:
+        left_side = start_side
+
+        surf = pygame.Surface(wh)
+        surf.set_colorkey(config.transparent_color)
+
+        for y in range(0, surf.get_height(), surf.get_height() // num_vertical_zigzags):
+            next_location = (0 if left_side else surf.get_width(), y)
+            pygame.draw.aaline(surf, color, previous_location, next_location)
+            previous_location = next_location
+            left_side = not left_side
+
+        frames.append(surf)
+
+    return frames
 
 
 class SpriteAtlasException(Exception):
@@ -116,11 +140,20 @@ class SpriteAtlas:
             surf.set_colorkey(color_key)
 
         mask = pygame.mask.from_threshold(surf, color_key or config.transparent_color) if generate_mask else None
-        self.statics[name] = surf, mask
+        self.statics[name] = StaticAnimation(surf, mask)
 
     def initialize_static_from_surface(self, name, surf, generate_mask=False):
         mask = pygame.mask.from_threshold(surf, surf.get_colorkey()) if generate_mask else None
-        self.statics[name] = surf, mask
+        self.statics[name] = StaticAnimation(surf, mask)
+
+    def initialize_animation_from_frames(self, name, frames, duration, generate_masks=False):
+        assert len(frames) > 0
+
+        masks = [pygame.mask.from_threshold(surf,
+                                            frames[0].get_colorkey() or config.transparent_color)
+                 for surf in frames] if generate_masks else None
+
+        self.animations[name] = Animation(frames, duration, masks)
 
     def load_static(self, name):
         return copy.copy(self._fetch(name, self.statics))

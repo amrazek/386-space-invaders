@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from entities.bullet import Bullet
 import config
 
 
@@ -12,7 +13,7 @@ class Ship(Sprite):
         self.bullet_manager = bullet_manager
 
         # load the ship image and get its rect
-        self.image, _ = config.atlas.load_static("ship")
+        self.image = config.atlas.load_static("ship").image
 
         self.rect = self.image.get_rect()
         self.screen_rect = pygame.Rect(0, 0, config.screen_width, config.screen_height)
@@ -48,4 +49,12 @@ class Ship(Sprite):
 
         if current_tick - self.last_shot >= self.min_time_between_shots:
             self.last_shot = current_tick
-            self.bullet_manager.create(self)
+
+            bullet_anim = config.atlas.load_static("player_bullet")
+            r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)
+            r.top = self.rect.top
+            r.centerx = self.rect.centerx
+
+            bullet = Bullet(self.stats.player_bullet, r.center, bullet_anim)
+
+            self.bullet_manager.add(bullet)
