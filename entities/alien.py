@@ -1,33 +1,34 @@
-from animated_sprite import AnimatedSprite
-import sprite_atlas
+from pygame.sprite import Sprite
 import config
 
 
-class Alien(AnimatedSprite):
+class Alien(Sprite):
     """A class to represent a single alien in the fleet"""
 
-    def __init__(self, stats, alien_type):
+    def __init__(self, stats, animation):
+        super().__init__()
+
         """Initialize the alien and set its starting position"""
-        super().__init__(sprite_atlas.aliens[alien_type], sprite_atlas.alien_animation_rate)
+        self.animation = animation
         self.stats = stats
 
+        # store the alien's exact position
+        self.position = 0.0
+
+        self.image = animation.current
         self.rect = self.image.get_rect()
 
-        # Start each new alien near the top left of the screen
-        self.rect.x, self.rect.y = self.rect.width, self.rect.height
-
-        # store the alien's exact position
-        self.x = float(self.rect.x)
-
     def update(self, elapsed):
-        super().update(elapsed)
-
         """Move the alien right or left."""
         movement_amt = self.stats.alien_speed * self.stats.fleet_direction * elapsed
 
-        self.x += movement_amt
+        self.position += movement_amt
 
-        self.rect.x = self.x
+        self.rect.x = self.position
+
+        """Update alien animation"""
+        self.animation.update(elapsed)
+        self.image = self.animation.current
 
     def check_edges(self):
         """Return true if alien is at edge of screen."""

@@ -1,7 +1,6 @@
 import pygame
 from pygame.sprite import Group
 from entities.alien import Alien
-import sprite_atlas
 import config
 
 
@@ -15,6 +14,8 @@ class AlienFleet:
         self.on_clear = on_clear_callback
         self.on_kill = on_kill_callback
         self.on_player_collision = on_player_collision_callback
+
+        self.alien_types = ["alien1", "alien2"]
         self.aliens = Group()
         self.create_new_fleet()
 
@@ -58,7 +59,8 @@ class AlienFleet:
     def create_new_fleet(self):
         """Create a full fleet of aliens"""
         # Create an alien and find the number of aliens in a row.
-        alien = Alien(self.stats, 0)
+        alien = Alien(self.stats, config.atlas.load_animation(self.alien_types[0]))
+
         number_aliens_x = self._get_number_aliens_x(alien.rect.width)
         number_rows = self._get_number_rows(alien.rect.height)
 
@@ -99,13 +101,13 @@ class AlienFleet:
 
     def _create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row"""
-        num_types = len(sprite_atlas.aliens)
-        alien = Alien(self.stats, alien_number % num_types)
+        num_types = len(self.alien_types)
+        alien = Alien(self.stats, config.atlas.load_animation(self.alien_types[alien_number % num_types]))
 
         alien_width = alien.rect.width
-        alien.x = alien_width + alien_width * alien_number
+        alien.rect.x = alien_width + alien_width * alien_number
         alien.rect.y = alien.rect.height + alien.rect.height * row_number
-        alien.rect.x = alien.x
+        alien.position = alien.rect.x
 
         self.aliens.add(alien)
 

@@ -1,7 +1,7 @@
 import os
 import copy
 import pygame
-from animated_sprite import AnimatedSprite
+from animation import Animation
 
 
 def load_atlas():
@@ -10,6 +10,8 @@ def load_atlas():
     atlas.initialize_static("ship")
     atlas.initialize_animation("alien1", 64, 64, 5)
     atlas.initialize_animation("alien2", 64, 64, 1)
+
+    return atlas
 
 
 class SpriteAtlasException(Exception):
@@ -50,7 +52,7 @@ class SpriteAtlas:
             raise RuntimeError
 
         # use the descriptor file to load subsurfaces
-        self._sprites = {}
+        self._sprite_rects = {}
 
         for line in file:
             # of the form: name = left top width height
@@ -58,7 +60,7 @@ class SpriteAtlas:
             rect = self._get_rect_from_str(rect_str)
 
             # add sprite to dictionary
-            self._sprites[name] = rect
+            self._sprite_rects[name] = rect
 
         self._animations = {}
         self._statics = {}  # statics aren't initialized to anything by default so user can specify color key if wanted
@@ -68,10 +70,10 @@ class SpriteAtlas:
             return self._animations[name]
 
         # grab rect for this name
-        if name not in self._sprites:
+        if name not in self._sprite_rects:
             raise SpriteNotFoundException(name)
 
-        rect = self._sprites[name]
+        rect = self._sprite_rects[name]
 
         frame_height = frame_height or frame_width
 
@@ -87,11 +89,12 @@ class SpriteAtlas:
             for f in frames:
                 f.set_colorkey(color_key)
 
-        sprite = AnimatedSprite(frames, duration)
-        self._animations[name] = sprite
+        animation = Animation(frames, duration)
+
+        self._animations[name] = animation
 
     def initialize_static(self, name, color_key=None):
-        rect = self._fetch(name, self._sprites)
+        rect = self._fetch(name, self._sprite_rects)
 
         sprite = self.atlas.subsurface(rect)
 
