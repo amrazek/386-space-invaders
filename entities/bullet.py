@@ -8,14 +8,15 @@ def generate_alien_bullet(wh, color):
     surf = pygame.Surface(wh)
     surf.set_colorkey(config.transparent_color)
 
-    num_vertical_zigzags = 3
+    num_vertical_zigzags = 5
     left_side = True
     previous_location = (0, 0)
 
-    for y in range(0, surf.get_height(), num_vertical_zigzags):
+    for y in range(0, surf.get_height(), surf.get_height() // num_vertical_zigzags):
         next_location = (0 if left_side else surf.get_width(), y)
         pygame.draw.aaline(surf, color, previous_location, next_location)
         previous_location = next_location
+        left_side = not left_side
 
     return surf
 
@@ -39,6 +40,9 @@ class Bullet(Sprite):
 
         self.image = pygame.Surface(self.rect.size)
         self.image.fill(color=self.color)
+
+        # temp
+        self.image = generate_alien_bullet((bullet_stats.width, bullet_stats.height), bullet_stats.color)
 
     def update(self, elapsed):
         """Move the bullet up the screen"""

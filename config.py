@@ -3,6 +3,7 @@ from pygame import Rect
 from typing import NamedTuple
 from sprite_atlas import load_atlas
 
+
 class BulletStats(NamedTuple):
     width: int
     height: int
@@ -20,10 +21,10 @@ screen_height = 600
 bg_color = (0, 0, 0)
 text_color = (255, 255, 255)
 screen_rect = Rect(0, 0, screen_width, screen_height)
-transparent_color = (0, 0, 0)
+transparent_color = (255, 0, 255)
 
 # Atlas
-atlas = load_atlas()
+atlas = None
 
 # ship settings
 ship_limit = 3
@@ -39,9 +40,9 @@ bullets_allowed = 3
 
 # alien bullet settings
 default_alien_bullet = BulletStats(
-    width=24,
-    height=16,
-    speed=-100.0,
+    width=6,
+    height=12,
+    speed=-60.0,
     color=Color(0, 255, 0))
 
 # Alien settings

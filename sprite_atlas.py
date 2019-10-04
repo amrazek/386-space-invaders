@@ -2,16 +2,22 @@ import os
 import copy
 import pygame
 from animation import Animation
+import config
 
 
 def load_atlas():
     atlas = SpriteAtlas(os.path.join('images', 'atlas.png'))
 
-    atlas.initialize_static("ship")
-    atlas.initialize_animation("alien1", 64, 64, 5)
-    atlas.initialize_animation("alien2", 64, 64, 1)
+    atlas.initialize_static("ship", color_key=config.transparent_color, generate_mask=True)
+    atlas.initialize_animation("alien1", 64, 64, 5, color_key=config.transparent_color)
+    atlas.initialize_animation("alien2", 64, 64, 1, color_key=config.transparent_color)
 
-    return atlas
+    from entities.bullet import generate_alien_bullet
+
+    #atlas.statics["alien_bullet"] = generate_alien_bullet((20, 20), color=(0, 0, 255))
+    atlas.initialize_static_from_surface("alien_bullet", generate_alien_bullet((20, 20), color=(0, 0, 255)), True)
+
+    config.atlas = atlas
 
 
 class SpriteAtlasException(Exception):
@@ -62,12 +68,12 @@ class SpriteAtlas:
             # add sprite to dictionary
             self._sprite_rects[name] = rect
 
-        self._animations = {}
-        self._statics = {}  # statics aren't initialized to anything by default so user can specify color key if wanted
+        self.animations = {}
+        self.statics = {}  # statics aren't initialized to anything by default so user can specify color key if wanted
 
-    def initialize_animation(self, name, frame_width, frame_height, duration, color_key=None):
-        if name in self._animations:
-            return self._animations[name]
+    def initialize_animation(self, name, frame_width, frame_height, duration, color_key=None, generate_masks=False):
+        if name in self.animations:
+            return self.animations[name]
 
         # grab rect for this name
         if name not in self._sprite_rects:
@@ -82,32 +88,45 @@ class SpriteAtlas:
 
         frames = [self.atlas.subsurface(
             pygame.Rect(x, y, frame_width, frame_height))
-            for x in range(0, rect.width, frame_width)
-            for y in range(0, rect.height, frame_height)]
+            for x in range(rect.x, rect.x + rect.width, frame_width)
+            for y in range(rect.y, rect.y + rect.height, frame_height)]
 
         if color_key is not None:
+            # cannot use per-pixel alpha values in this case
+            converted = [s.convert() for s in frames]
+            frames = converted
+
             for f in frames:
                 f.set_colorkey(color_key)
 
-        animation = Animation(frames, duration)
+        masks = [pygame.mask.from_threshold(surf, color_key or config.transparent_color) for surf in frames]\
+            if generate_masks else None
 
-        self._animations[name] = animation
+        animation = Animation(frames, duration, masks)
 
-    def initialize_static(self, name, color_key=None):
+        self.animations[name] = animation
+
+    def initialize_static(self, name, color_key=None, generate_mask=False):
         rect = self._fetch(name, self._sprite_rects)
 
-        sprite = self.atlas.subsurface(rect)
+        surf = self.atlas.subsurface(rect)
 
         if color_key is not None:
-            sprite.set_colorkey(color_key)
+            surf = surf.convert()
+            surf.set_colorkey(color_key)
 
-        self._statics[name] = sprite
+        mask = pygame.mask.from_threshold(surf, color_key or config.transparent_color) if generate_mask else None
+        self.statics[name] = surf, mask
+
+    def initialize_static_from_surface(self, name, surf, generate_mask=False):
+        mask = pygame.mask.from_threshold(surf, surf.get_colorkey()) if generate_mask else None
+        self.statics[name] = surf, mask
 
     def load_static(self, name):
-        return copy.copy(self._fetch(name, self._statics))
+        return copy.copy(self._fetch(name, self.statics))
 
     def load_animation(self, name):
-        return copy.copy(self._fetch(name, self._animations))
+        return copy.copy(self._fetch(name, self.animations))
 
     @staticmethod
     def _fetch(name, location):

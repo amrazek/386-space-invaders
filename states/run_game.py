@@ -3,7 +3,7 @@ from states.game_over import GameOver
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
 from session_stats import SessionStats
-from entities.alien_fleet import AlienFleet
+from alien_fleet import AlienFleet
 from entities.ship import Ship
 from entities.bunker import Bunker
 import config
@@ -76,6 +76,10 @@ class RunGame(GameState):
 
             # reset player position and state
             self.ship.center_ship()
+
+            # clear all bullets
+            self.player_bullets.clear()
+            self.alien_bullets.clear()
 
         else:  # no ships left
             pass  # done TODO: prepare transition to next state

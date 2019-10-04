@@ -12,7 +12,7 @@ class Ship(Sprite):
         self.bullet_manager = bullet_manager
 
         # load the ship image and get its rect
-        self.image = pygame.image.load("images/ship.bmp")  # todo: use a sprite sheet instead of loading every time
+        self.image, _ = config.atlas.load_static("ship")
 
         self.rect = self.image.get_rect()
         self.screen_rect = pygame.Rect(0, 0, config.screen_width, config.screen_height)

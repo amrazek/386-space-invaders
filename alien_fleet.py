@@ -15,7 +15,7 @@ class AlienFleet:
         self.on_kill = on_kill_callback
         self.on_player_collision = on_player_collision_callback
 
-        self.alien_types = ["alien1", "alien2"]
+        self.alien_types = ['alien1', 'alien2']
         self.aliens = Group()
         self.create_new_fleet()
 
@@ -116,7 +116,7 @@ class AlienFleet:
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= config.screen_height:
                 # Treat this the same as if the ship got hit
-                self.ship.hit()
+                self.on_player_collision()
                 break
 
     def _check_bullet_alien_collisions(self, bullets):

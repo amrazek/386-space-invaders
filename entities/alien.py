@@ -15,7 +15,7 @@ class Alien(Sprite):
         # store the alien's exact position
         self.position = 0.0
 
-        self.image = animation.current
+        self.image = animation.image
         self.rect = self.image.get_rect()
 
     def update(self, elapsed):
@@ -28,7 +28,7 @@ class Alien(Sprite):
 
         """Update alien animation"""
         self.animation.update(elapsed)
-        self.image = self.animation.current
+        self.image = self.animation.image
 
     def check_edges(self):
         """Return true if alien is at edge of screen."""
