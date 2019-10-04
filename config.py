@@ -1,7 +1,7 @@
 from pygame import Color
 from pygame import Rect
 from typing import NamedTuple
-
+from sprite_atlas import load_atlas
 
 class BulletStats(NamedTuple):
     width: int
@@ -21,6 +21,9 @@ bg_color = (0, 0, 0)
 text_color = (255, 255, 255)
 screen_rect = Rect(0, 0, screen_width, screen_height)
 transparent_color = (0, 0, 0)
+
+# Atlas
+atlas = load_atlas()
 
 # ship settings
 ship_limit = 3

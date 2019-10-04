@@ -45,7 +45,7 @@ class RunGame(GameState):
             self.ship.fire()
 
     def draw(self, screen):
-        screen.fill(color=(0, 0, 50))
+        screen.fill(color=config.bg_color)
         screen.blit(self.ship.image, self.ship.rect)
 
         self.player_bullets.draw(screen)

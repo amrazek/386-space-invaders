@@ -1,7 +1,5 @@
 import pygame
-import sprite_atlas
 from states.run_game import RunGame
-from states.bunker_test import BunkerTest
 from states.input_state import InputState
 from timer import game_timer
 import config
@@ -14,8 +12,8 @@ def run_game():
     screen = pygame.display.set_mode((config.screen_width, config.screen_height), pygame.DOUBLEBUF)
     pygame.display.set_caption("Space Invaders")
 
-    # load all animated sprite images needed for the game
-    sprite_atlas.load_atlas()
+    # # load all animated sprite images needed for the game
+    # sprite_atlas.load_atlas()
 
     # init game
     input_state = InputState()
