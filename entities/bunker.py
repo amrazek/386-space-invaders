@@ -155,12 +155,14 @@ class Bunker:
             for y in range(0, surf.get_rect().height, config.bunker_tile_size):
                 slice_surf = pygame.Surface(src_rect.size)
                 slice_surf.blit(surf, dest_rect, src_rect)
+
                 slice_surf.set_colorkey(config.transparent_color)
 
                 # avoid creating blank slices by making sure the tile has some content
-                threshold = pygame.transform.threshold(None, slice_surf, config.transparent_color, set_behavior=0)
+                threshold = pygame.transform.threshold(None, slice_surf, surf.get_colorkey(), set_behavior=0)
+                slice_surf.set_colorkey(config.transparent_color)
 
-                if threshold < dest_rect.width * dest_rect.height:
+                if threshold < dest_rect.width * dest_rect.height * 0.33:  # less than 33% transparent
                     r = src_rect.copy()
                     r.left -= surf.get_width() // 2
                     r.top -= surf.get_height() // 2

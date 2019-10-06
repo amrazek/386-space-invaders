@@ -40,7 +40,7 @@ class PlayerDeath(GameState):
     def explosion_callback(self):
         self.ran = True
 
-        if self.running_game.stats.ships_left >= 0:
+        if self.running_game.stats.ships_left > 0:
 
             # Reduce player lives
             self.running_game.stats.decrease_lives()
@@ -57,7 +57,7 @@ class PlayerDeath(GameState):
 
             self.running_game.next_state = None  # clear next state so game continues
         else:
-            self.running_game.next_state = GameOver(self.input_state, self)
+            self.running_game.next_state = GameOver(self.input_state, self.running_game)
 
         self.running_game.scoreboard.set_dirty()
 
