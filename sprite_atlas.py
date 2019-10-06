@@ -29,8 +29,8 @@ def load_atlas():
     alien_keys = [k for k in atlas.animations.keys() if k.startswith("alien")]
 
     for key in [k for k in atlas.animations.keys() if k.startswith("alien")]:
-        frames = generate_explosion_frames(atlas.load_animation(key).image, 4, .25, 1.25, 6.5)
-        atlas.initialize_animation_from_frames(key + "_explosion", frames, 1.0)
+        frames = generate_explosion_frames(atlas.load_animation(key).image, 4, 1, 2, 8)
+        atlas.initialize_animation_from_frames(key + "_explosion", frames, .25)
 
     config.atlas = atlas
 
