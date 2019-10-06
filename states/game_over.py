@@ -38,7 +38,7 @@ class GameOver(GameState):
         pass  # todo: check for button? key?
 
     def draw(self, screen):
-        self.previous_state.draw(screen)
+        self.previous_state.draw(screen, draw_ship=False)
         screen.blit(self.dialog, self.dialog_rect)
 
     @property

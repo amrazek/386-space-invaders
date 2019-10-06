@@ -1,5 +1,5 @@
 from states.game_state import GameState
-from states.game_over import GameOver
+from states.player_death import PlayerDeath
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
 from session_stats import SessionStats
@@ -28,8 +28,7 @@ class RunGame(GameState):
                                 on_player_collision_callback=self._player_destroyed)
 
         self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.alien_bullets)
-
-        self.game_over = GameOver(input_state, self)
+        self.next_state = None
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
@@ -44,9 +43,11 @@ class RunGame(GameState):
         if self.input_state.fire:
             self.ship.fire()
 
-    def draw(self, screen):
+    def draw(self, screen, draw_ship=True):
         screen.fill(color=config.bg_color)
-        screen.blit(self.ship.image, self.ship.rect)
+
+        if draw_ship:
+            screen.blit(self.ship.image, self.ship.rect)
 
         self.player_bullets.draw(screen)
         self.alien_bullets.draw(screen)
@@ -59,32 +60,13 @@ class RunGame(GameState):
 
     @property
     def finished(self):
-        return self.stats.ships_left == 0
+        return self.get_next() is not None
 
     def get_next(self):
-        return self.game_over
+        return self.next_state
 
     def _player_destroyed(self):
-        if self.stats.player_alive:
-            print("Player was destroyed")
-
-            # Reduce player lives
-            self.stats.decrease_lives()
-
-            # create a new fleet
-            self.fleet.create_new_fleet()
-
-            # reset player position and state
-            self.ship.center_ship()
-
-            # clear all bullets
-            self.player_bullets.clear()
-            self.alien_bullets.clear()
-
-        else:  # no ships left
-            pass  # done TODO: prepare transition to next state
-
-        self.scoreboard.set_dirty()
+        self.next_state = self.next_state or PlayerDeath(self.input_state, self)
 
     def _on_alien_killed(self, alien):
         self.stats.increase_score(self.stats.alien_points)

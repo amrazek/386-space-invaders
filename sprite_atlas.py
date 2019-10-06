@@ -21,8 +21,8 @@ def load_atlas():
     atlas.initialize_animation_from_frames("alien_bullet", frames, 0.5, generate_masks=True)
 
     # explosion frames for ship
-    frames = generate_explosion_frames(atlas.load_static("ship").image, 16, .50, 1.25, 6.5)
-    atlas.initialize_animation_from_frames("ship_explosion", frames, 1.0)
+    frames = generate_explosion_frames(atlas.load_static("ship").image, 16, .5, 1.25, 15.5, 4.0)
+    atlas.initialize_animation_from_frames("ship_explosion", frames, .5)
 
     # explosion frames for aliens
     frames = generate_explosion_frames(atlas.load_animation("alien1").image, 4, .25, 1.25, 6.5)
@@ -58,11 +58,25 @@ def generate_alien_bullet_frames(wh, color):
     return frames
 
 
-def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max_velocity):
+def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max_velocity, scale_multiplier=1.):
     frames = []
-    original_pixels = pygame.PixelArray(from_surf)
 
-    from typing import NamedTuple
+    # if scale_multiplier != 1.:
+    #     dest = pygame.Surface(
+    #         (from_surf.get_width() * scale_multiplier, from_surf.get_height() * scale_multiplier)).convert_alpha()
+    #     src = from_surf
+    #
+    #     # can't run smooth scale unless source is 24 or 32 bit surface
+    #     if src.get_bytesize() not in [3, 4]:
+    #         from_rect = from_surf.get_rect()
+    #         src = pygame.Surface(from_surf.get_rect().size, depth=32)
+    #
+    #         src.blit(from_surf, from_rect)
+    #
+    #     pygame.transform.scale(from_surf, dest.get_rect().size, dest)
+    #     from_surf = dest
+
+    original_pixels = pygame.PixelArray(from_surf)
 
     class Pixel:
         color: pygame.Color
@@ -95,6 +109,10 @@ def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max
         velocity=random_velocity())
         for x in range(from_surf.get_width()) for y in range(from_surf.get_height())]
 
+    frame_rect = pygame.Rect(0, 0, from_surf.get_width(), from_surf.get_height())
+    frame_rect.width = int(frame_rect.width * scale_multiplier)
+    frame_rect.height = int(frame_rect.height * scale_multiplier)
+
     # if the original surface had an alpha color, we should set those pixels to invisible to begin with
     if from_surf.get_colorkey is not None:
         for pixel in frame_pixels:
@@ -104,6 +122,9 @@ def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max
                 pixel.color = pygame.Color(255, 0, 255, 0)
 
     elapsed = 0.0
+
+    frame_offset_x = frame_rect.width // 2 - from_surf.get_width() // 2
+    frame_offset_y = frame_rect.height // 2 - from_surf.get_height() // 2
 
     for frame_index in range(num_frames):
 
@@ -116,12 +137,13 @@ def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max
         elapsed += duration / float(num_frames)
 
         # generate this surface, with per-pixel alpha
-        surf = pygame.Surface(from_surf.get_rect().size).convert_alpha(pygame.display.get_surface())
+        surf = pygame.Surface(frame_rect.size).convert_alpha(pygame.display.get_surface())
         surf.fill((0, 0, 0, 0))  # fill with transparent
         p = pygame.PixelArray(surf)
 
         for idx in range(len(frame_pixels)):
-            x_coord, y_coord = int(frame_pixels[idx].position.x), int(frame_pixels[idx].position.y)
+            x_coord = int(frame_pixels[idx].position.x) + frame_offset_x
+            y_coord = int(frame_pixels[idx].position.y) + frame_offset_y
 
             if 0 <= x_coord < surf.get_width() and 0 <= y_coord < surf.get_height():
                 p[x_coord, y_coord] = surf.map_rgb(frame_pixels[idx].color)

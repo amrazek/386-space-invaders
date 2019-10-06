@@ -1,3 +1,8 @@
+from pygame import Surface
+from pygame.sprite import Sprite
+import config
+
+
 class Animation:
     duration: float
     frames: []
@@ -74,3 +79,53 @@ class StaticAnimation(Animation):
 
     def update(self, elapsed):
         pass
+
+
+class OneShotAnimation(Animation):
+    def __init__(self, frames, duration, on_complete_callback=None):
+        if not isinstance(frames, list):
+            frames = [frames]
+
+        super().__init__(frames, duration=duration)
+
+        self.on_complete = on_complete_callback
+        self.finished = False
+        self.finished_image = Surface((1, 1))
+        self.finished_image.fill(config.transparent_color)
+        self.finished_image.set_colorkey(config.transparent_color)
+
+    @staticmethod
+    def from_animation(animation, duration=None, on_complete_callback=None):
+        return OneShotAnimation(animation.frames, duration or animation.duration, on_complete_callback)
+
+    def update(self, elapsed):
+        if self.finished:
+            return
+
+        # if the frame has changed and the new frame is less than the old
+        # frame, the animation played out completely
+        # note that we don't just check if on last frame: it's possible, though unlikely, that
+        # an animation skips a frame entirely if enough time has elapsed
+        current_frame = self.current_frame_index
+        super().update(elapsed)
+        new_frame = self.current_frame_index
+
+        if current_frame != new_frame and new_frame < current_frame:
+            if self.on_complete is not None:
+                self.on_complete()
+
+            self.finished = True
+            self.current_frame = self.finished_image
+
+
+class AnimatedSprite(Sprite):
+    def __init__(self, *, animation):
+        super().__init__()
+
+        self.animation = animation
+        self.rect = self.animation.current_frame.get_rect()
+        self.image = self.animation.image
+
+    def update(self, elapsed):
+        self.animation.update(elapsed)
+        self.image = self.animation.image
