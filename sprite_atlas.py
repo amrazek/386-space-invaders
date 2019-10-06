@@ -1,5 +1,7 @@
 import os
 import copy
+import random
+import math
 import pygame
 from animation import Animation
 from animation import StaticAnimation
@@ -14,9 +16,21 @@ def load_atlas():
     atlas.initialize_animation("alien1", 64, 64, 5, color_key=config.transparent_color)
     atlas.initialize_animation("alien2", 64, 64, 1, color_key=config.transparent_color)
 
+    # alien bullet frames
     frames = generate_alien_bullet_frames(config.default_alien_bullet.size, config.default_alien_bullet.color)
-
     atlas.initialize_animation_from_frames("alien_bullet", frames, 0.5, generate_masks=True)
+
+    # explosion frames for ship
+    frames = generate_explosion_frames(atlas.load_static("ship").image, 16, .50, 1.25, 6.5)
+    atlas.initialize_animation_from_frames("ship_explosion", frames, 1.0)
+
+    # explosion frames for aliens
+    frames = generate_explosion_frames(atlas.load_animation("alien1").image, 4, .25, 1.25, 6.5)
+    atlas.initialize_animation_from_frames("alien1_explosion", frames, 1.0)
+
+    frames = generate_explosion_frames(atlas.load_animation("alien2").image, 4, .25, 1.25, 6.5)
+    atlas.initialize_animation_from_frames("alien2_explosion", frames, 1.0)
+
     config.atlas = atlas
 
 
@@ -40,6 +54,82 @@ def generate_alien_bullet_frames(wh, color):
             left_side = not left_side
 
         frames.append(surf)
+
+    return frames
+
+
+def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max_velocity):
+    frames = []
+    original_pixels = pygame.PixelArray(from_surf)
+
+    from typing import NamedTuple
+
+    class Pixel:
+        color: pygame.Color
+        position: pygame.Vector2
+        velocity: pygame.Vector2
+
+        def __init__(self, x, y, color, velocity):
+            self.position = pygame.Vector2()
+            self.position.x, self.position.y = x, y
+            self.color = color
+            self.velocity = velocity
+
+    def random_angle():
+        return random.uniform(0, 2.0 * math.pi)
+
+    def random_velocity():
+        velocity = random.uniform(0, max_velocity - min_velocity) + min_velocity
+        v = pygame.Vector2()
+        a = random_angle()
+
+        v.x = math.cos(a) * velocity
+        v.y = math.sin(a) * velocity
+
+        return v
+
+    frame_pixels = [Pixel(
+        color=from_surf.unmap_rgb(original_pixels[x, y]),
+        x=float(x),
+        y=float(y),
+        velocity=random_velocity())
+        for x in range(from_surf.get_width()) for y in range(from_surf.get_height())]
+
+    # if the original surface had an alpha color, we should set those pixels to invisible to begin with
+    if from_surf.get_colorkey is not None:
+        for pixel in frame_pixels:
+            x, y = int(pixel.position.x), int(pixel.position.y)
+
+            if from_surf.unmap_rgb(original_pixels[x, y]) == from_surf.get_colorkey():
+                pixel.color = pygame.Color(255, 0, 255, 0)
+
+    elapsed = 0.0
+
+    for frame_index in range(num_frames):
+
+        # update pixel positions and alpha
+        for pixel in frame_pixels:
+            pixel.position += pixel.velocity * elapsed
+            alpha = int(255 - 255 * (elapsed / duration)) if pixel.color.a > 0 else 0
+            pixel.color.a = alpha
+
+        elapsed += duration / float(num_frames)
+
+        # generate this surface, with per-pixel alpha
+        surf = pygame.Surface(from_surf.get_rect().size).convert_alpha(pygame.display.get_surface())
+        surf.fill((0, 0, 0, 0))  # fill with transparent
+        p = pygame.PixelArray(surf)
+
+        for idx in range(len(frame_pixels)):
+            x_coord, y_coord = int(frame_pixels[idx].position.x), int(frame_pixels[idx].position.y)
+
+            if 0 <= x_coord < surf.get_width() and 0 <= y_coord < surf.get_height():
+                p[x_coord, y_coord] = surf.map_rgb(frame_pixels[idx].color)
+
+        p.close()
+        frames.append(surf)
+
+    original_pixels.close()
 
     return frames
 
@@ -123,7 +213,7 @@ class SpriteAtlas:
             for f in frames:
                 f.set_colorkey(color_key)
 
-        masks = [pygame.mask.from_threshold(surf, color_key or config.transparent_color) for surf in frames]\
+        masks = [pygame.mask.from_threshold(surf, color_key or config.transparent_color) for surf in frames] \
             if generate_masks else None
 
         animation = Animation(frames, duration, masks)
