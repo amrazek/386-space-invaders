@@ -25,11 +25,12 @@ def load_atlas():
     atlas.initialize_animation_from_frames("ship_explosion", frames, .5)
 
     # explosion frames for aliens
-    frames = generate_explosion_frames(atlas.load_animation("alien1").image, 4, .25, 1.25, 6.5)
-    atlas.initialize_animation_from_frames("alien1_explosion", frames, 1.0)
+    keys = atlas.animations.keys()
+    alien_keys = [k for k in atlas.animations.keys() if k.startswith("alien")]
 
-    frames = generate_explosion_frames(atlas.load_animation("alien2").image, 4, .25, 1.25, 6.5)
-    atlas.initialize_animation_from_frames("alien2_explosion", frames, 1.0)
+    for key in [k for k in atlas.animations.keys() if k.startswith("alien")]:
+        frames = generate_explosion_frames(atlas.load_animation(key).image, 4, .25, 1.25, 6.5)
+        atlas.initialize_animation_from_frames(key + "_explosion", frames, 1.0)
 
     config.atlas = atlas
 
@@ -60,22 +61,6 @@ def generate_alien_bullet_frames(wh, color):
 
 def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max_velocity, scale_multiplier=1.):
     frames = []
-
-    # if scale_multiplier != 1.:
-    #     dest = pygame.Surface(
-    #         (from_surf.get_width() * scale_multiplier, from_surf.get_height() * scale_multiplier)).convert_alpha()
-    #     src = from_surf
-    #
-    #     # can't run smooth scale unless source is 24 or 32 bit surface
-    #     if src.get_bytesize() not in [3, 4]:
-    #         from_rect = from_surf.get_rect()
-    #         src = pygame.Surface(from_surf.get_rect().size, depth=32)
-    #
-    #         src.blit(from_surf, from_rect)
-    #
-    #     pygame.transform.scale(from_surf, dest.get_rect().size, dest)
-    #     from_surf = dest
-
     original_pixels = pygame.PixelArray(from_surf)
 
     class Pixel:

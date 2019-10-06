@@ -1,4 +1,3 @@
-import pygame
 from pygame.sprite import Sprite, Group
 from config import BulletStats
 import config
@@ -53,7 +52,7 @@ class BulletManager:
             if bullet.rect.bottom <= 0 or bullet.rect.top >= config.screen_height:
                 self._bullets.remove(bullet)
 
-    def clear(self):
+    def empty(self):
         self._bullets.empty()
 
     def draw(self, screen):

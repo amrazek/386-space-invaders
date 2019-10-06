@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 import config
 
 
-class Animation:
+class Animation(Sprite):
     duration: float
     frames: []
 
@@ -11,6 +11,8 @@ class Animation:
         assert len(frames) > 0
         assert duration >= 0
         assert not masks or (masks and len(masks) == len(frames))
+
+        super().__init__()
 
         self.frames = frames
         self.frame_count = len(frames)
@@ -22,6 +24,8 @@ class Animation:
         self.current_mask = self.masks[0] if self.masks else None
         self.width = frames[0].get_width()
         self.height = frames[0].get_height()
+
+        self.rect = self.image.get_rect()
 
     @property
     def duration(self):
@@ -118,14 +122,14 @@ class OneShotAnimation(Animation):
             self.current_frame = self.finished_image
 
 
-class AnimatedSprite(Sprite):
-    def __init__(self, *, animation):
-        super().__init__()
-
-        self.animation = animation
-        self.rect = self.animation.current_frame.get_rect()
-        self.image = self.animation.image
-
-    def update(self, elapsed):
-        self.animation.update(elapsed)
-        self.image = self.animation.image
+# class AnimatedSprite(Sprite):
+#     def __init__(self, *, animation):
+#         super().__init__()
+#
+#         self.animation = animation
+#         self.rect = self.animation.current_frame.get_rect()
+#         self.image = self.animation.image
+#
+#     def update(self, elapsed):
+#         self.animation.update(elapsed)
+#         self.image = self.animation.image

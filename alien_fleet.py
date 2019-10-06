@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Group
 from entities.alien import Alien
 from entities.bullet import Bullet
+from animation import OneShotAnimation
 import config
 
 
@@ -18,6 +19,8 @@ class AlienFleet:
 
         self.alien_types = ['alien1', 'alien2']
         self.aliens = Group()
+
+        self.explosions = Group()
         self.create_new_fleet()
 
         # temp
@@ -27,6 +30,7 @@ class AlienFleet:
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
         self.__check_fleet_edges()
         self.aliens.update(elapsed)
+        self.explosions.update(elapsed)
 
         # Look for alien-ship collisions
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
@@ -56,6 +60,7 @@ class AlienFleet:
 
     def draw(self, screen):
         self.aliens.draw(screen)
+        self.explosions.draw(screen)
 
     def create_new_fleet(self):
         """Create a full fleet of aliens"""
@@ -66,6 +71,8 @@ class AlienFleet:
         number_rows = self._get_number_rows(alien.rect.height)
 
         self.aliens.empty()
+        self.explosions.empty()
+        self.alien_bullets.empty()
 
         # Create the first row of aliens
         for row_number in range(number_rows):
@@ -103,14 +110,31 @@ class AlienFleet:
     def _create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row"""
         num_types = len(self.alien_types)
-        alien = Alien(self.stats, config.atlas.load_animation(self.alien_types[alien_number % num_types]))
+        alien_type = self.alien_types[alien_number % num_types]
+
+        alien = Alien(self.stats, config.atlas.load_animation(alien_type))
 
         alien_width = alien.rect.width
         alien.rect.x = alien_width + alien_width * alien_number
         alien.rect.y = alien.rect.height + alien.rect.height * row_number
         alien.position = alien.rect.x
+        alien.type = alien_type
 
         self.aliens.add(alien)
+
+    def _create_alien_explosion(self, alien):
+        """Create an alien explosion located where this alien is"""
+        explosion_animation = config.atlas.load_animation(alien.type + "_explosion")
+        explosion = OneShotAnimation.from_animation(explosion_animation)
+
+        # a little closure to automatically remove explosion when it's done running
+        def die_on_finish():
+            self.explosions.remove(explosion)
+
+        explosion.on_complete = die_on_finish
+        explosion.rect.center = alien.rect.center
+
+        self.explosions.add(explosion)
 
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
@@ -128,6 +152,7 @@ class AlienFleet:
         if collisions:
             for aliens in collisions.values():
                 for an_alien in aliens:
+                    self._create_alien_explosion(an_alien)
                     self.on_kill(an_alien)
 
         if len(self.aliens) == 0:
