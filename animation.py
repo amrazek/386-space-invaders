@@ -120,16 +120,3 @@ class OneShotAnimation(Animation):
 
             self.finished = True
             self.current_frame = self.finished_image
-
-
-# class AnimatedSprite(Sprite):
-#     def __init__(self, *, animation):
-#         super().__init__()
-#
-#         self.animation = animation
-#         self.rect = self.animation.current_frame.get_rect()
-#         self.image = self.animation.image
-#
-#     def update(self, elapsed):
-#         self.animation.update(elapsed)
-#         self.image = self.animation.image

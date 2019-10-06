@@ -1,5 +1,6 @@
 import pygame
 from states.run_game import RunGame
+from states.high_score import HighScore, EnterHighScore
 from states.input_state import InputState
 from timer import game_timer
 from sprite_atlas import load_atlas
@@ -19,8 +20,7 @@ def run_game():
     # init game
     input_state = InputState()
     game_state = RunGame(input_state)
-
-    pygame.key.start_text_input()
+    game_state = HighScore(input_state, game_state.stats)
 
     # start main loop for the game
     while not input_state.quit and game_state is not None:
