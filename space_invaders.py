@@ -11,7 +11,7 @@ def run_game():
     # initialize PyGame and create screen surface
     pygame.init()
 
-    screen = pygame.display.set_mode((config.screen_width, config.screen_height), pygame.DOUBLEBUF)
+    screen = pygame.display.set_mode((config.screen_width, config.screen_height))
     pygame.display.set_caption("Space Invaders")
 
     # load all animated sprite images needed for the game
@@ -20,7 +20,8 @@ def run_game():
     # init game
     input_state = InputState()
     game_state = RunGame(input_state)
-    game_state = HighScore(input_state, game_state.stats)
+    #game_state = HighScore(input_state, game_state.stats)
+    game_state = EnterHighScore(input_state, game_state.stats)
 
     # start main loop for the game
     while not input_state.quit and game_state is not None:

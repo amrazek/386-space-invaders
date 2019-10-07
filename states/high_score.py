@@ -17,23 +17,25 @@ class HighScore(GameState):
     def __init__(self, input_state, game_stats: SessionStats):
         super().__init__(input_state)
 
+        self.stats = game_stats
         self.font = pygame.font.SysFont(None, 48)
         self.high_scores = [_Score("abc", x * 100) for x in reversed(range(10))]
 
         # create high score text
         self.high_score_image = self.font.render("High Scores", True, config.text_color)
+        self.high_score_image = self.high_score_image.convert_alpha(pygame.display.get_surface())
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.center = config.screen_rect.center
         self.high_score_rect.top = 50
 
         self.score_group = pygame.sprite.Group()
-
         self._update_high_score_list()
 
     def update(self, elapsed):
         pass
 
     def draw(self, screen):
+        screen.fill(config.bg_color)
         screen.blit(self.high_score_image, self.high_score_rect)
         self.score_group.draw(screen)
 
@@ -72,9 +74,9 @@ class HighScore(GameState):
 
         images = [place_image, score_image, player_image]
         offset = available_width // len(images)
-        surf = pygame.Surface((available_width, max(i.get_height() for i in images))).convert_alpha(
-            pygame.display.get_surface())
-        surf.fill(color=(0, 255, 0, 128))
+        surf = pygame.Surface((available_width, max(i.get_height() for i in images)))
+        surf = surf.convert_alpha(pygame.display.get_surface())
+        surf.fill(color=(0, 255, 0, 0))
 
         r = place_image.get_rect()
         r.width = offset
@@ -92,15 +94,66 @@ class EnterHighScore(GameState):
     def __init__(self, input_state, game_stats: SessionStats):
         super().__init__(input_state)
 
+        self.stats = game_stats
+        self.font = pygame.font.SysFont(None, 48)
+        self.prompt_group = pygame.sprite.Group()
+
+        new_high_score = self.font.render("New high score!", True, config.text_color)
+        new_high_score = StaticAnimation(new_high_score)
+        new_high_score.rect.centerx = config.screen_rect.centerx
+        new_high_score.rect.top = 50
+        self.prompt_group.add(new_high_score)
+
+        self.entered_name_image = None
+        self.entered_name_rect = None
+        self.entered_name = ""
+
+        # todo: is current score better than lowest high score?
+
+        self._update_name_image()
+        self.entered_name_rect.centerx = new_high_score.rect.centerx
+        self.entered_name_rect.top = new_high_score.rect.bottom + 10
+
+        self.done = False
+
     def update(self, elapsed):
-        raise NotImplementedError
+        if self.done:
+            return
+
+        self.prompt_group.update(elapsed)
+
+        # check for any new key inputs
+        for key_code in self.input_state.key_codes:
+            if key_code == pygame.K_BACKSPACE or key_code == pygame.K_KP_ENTER:
+                self.entered_name = self.entered_name[:-1]
+                self._update_name_image()
+            elif key_code == pygame.K_RETURN:
+                if len(self.entered_name) == 3:
+                    print("accept this name: {}".format(self.entered_name))
+                    self.done = True
+                else:
+                    print("name denied: need 3 letters")  # todo: error sound?
+            elif str.isalnum(pygame.key.name(key_code)) and len(self.entered_name) < 3:
+                letter = pygame.key.name(key_code)
+                self.entered_name += letter
+                self._update_name_image()
+
+            the_key = pygame.key.name(key_code)
+
+        self.input_state.key_codes.clear()
 
     def draw(self, screen):
-        raise NotImplementedError
+        screen.fill(config.bg_color)
+        self.prompt_group.draw(screen)
+        screen.blit(self.entered_name_image, self.entered_name_rect)
 
     @property
     def finished(self):
-        raise NotImplementedError
+        return self.done
 
     def get_next(self):
-        raise NotImplementedError
+        return HighScore(self.input_state, self.stats)
+
+    def _update_name_image(self):
+        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name, True, config.text_color)
+        self.entered_name_rect = self.entered_name_rect or self.entered_name_image.get_rect()
