@@ -64,6 +64,6 @@ class InputState:
 
         if alpha or digit or key in [K_SPACE, K_BACKSPACE, K_RETURN, K_KP_ENTER]:
             upper = pygame.key.get_mods() & KMOD_SHIFT
-            key = key & ~0x20 if alpha and (pygame.key.get_mods() & KMOD_SHIFT) else key
+            key = key & ~0x20 if alpha and upper else key
 
             self.key_codes.append(key)

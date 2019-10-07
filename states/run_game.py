@@ -77,8 +77,8 @@ class RunGame(GameState):
         self.stats.increase_level()
 
         # clear all bullets
-        self.player_bullets.clear()
-        self.alien_bullets.clear()
+        self.player_bullets.empty()
+        self.alien_bullets.empty()
 
         # reset scoreboard
         self.scoreboard.set_dirty()

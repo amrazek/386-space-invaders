@@ -20,8 +20,8 @@ def run_game():
     # init game
     input_state = InputState()
     game_state = RunGame(input_state)
-    #game_state = HighScore(input_state, game_state.stats)
-    game_state = EnterHighScore(input_state, game_state.stats)
+    game_state = HighScore(input_state, game_state.stats)
+    game_state = EnterHighScore(input_state, game_state.stats, game_state)
 
     # start main loop for the game
     while not input_state.quit and game_state is not None:
