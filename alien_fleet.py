@@ -17,7 +17,6 @@ class AlienFleet:
         self.on_kill = on_kill_callback
         self.on_player_collision = on_player_collision_callback
 
-        self.alien_types = ['alien3', 'alien4']
         self.aliens = Group()
 
         self.explosions = Group()
@@ -65,7 +64,7 @@ class AlienFleet:
     def create_new_fleet(self):
         """Create a full fleet of aliens"""
         # Create an alien and find the number of aliens in a row.
-        alien = Alien(self.stats, config.atlas.load_animation(self.alien_types[0]))
+        alien = Alien(self.stats, config.atlas.load_animation(config.alien_stats[0].sprite_name))
 
         number_aliens_x = self._get_number_aliens_x(alien.rect.width)
         number_rows = self._get_number_rows(alien.rect.height)
@@ -109,22 +108,22 @@ class AlienFleet:
 
     def _create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row"""
-        num_types = len(self.alien_types)
-        alien_type = self.alien_types[alien_number % num_types]
+        num_types = len(config.alien_stats)
+        alien_type = config.alien_stats[alien_number % num_types]
 
-        alien = Alien(self.stats, config.atlas.load_animation(alien_type))
+        alien = Alien(self.stats, config.atlas.load_animation(alien_type.sprite_name))
 
         alien_width = alien.rect.width
         alien.rect.x = alien_width + alien_width * alien_number
         alien.rect.y = alien.rect.height + alien.rect.height * row_number
         alien.position = alien.rect.x
-        alien.type = alien_type
+        alien.sprite_name = alien_type.sprite_name
 
         self.aliens.add(alien)
 
     def _create_alien_explosion(self, alien):
         """Create an alien explosion located where this alien is"""
-        explosion_animation = config.atlas.load_animation(alien.type + "_explosion")
+        explosion_animation = config.atlas.load_animation(alien.sprite_name + "_explosion")
         explosion = OneShotAnimation.from_animation(explosion_animation)
 
         # a little closure to automatically remove explosion when it's done running

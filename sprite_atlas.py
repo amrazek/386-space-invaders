@@ -14,11 +14,13 @@ def load_atlas():
     atlas.initialize_static("ship", color_key=config.transparent_color, override_width=48)
     atlas.initialize_static("player_bullet", color_key=config.transparent_color, generate_mask=True)
     atlas.initialize_static("selector", color_key=config.transparent_color)
+    atlas.initialize_static("ship_no_engines", color_key=config.transparent_color)
+
     atlas.initialize_animation("ship", 48, 32, 0.25, color_key=config.transparent_color)
-    atlas.initialize_animation("alien1", 32, 32, 1, color_key=config.transparent_color)
-    atlas.initialize_animation("alien2", 32, 32, 1, color_key=config.transparent_color)
-    atlas.initialize_animation("alien3", 32, 32, 1, color_key=config.transparent_color)
-    atlas.initialize_animation("alien4", 32, 32, 1, color_key=config.transparent_color)
+
+    # init alien sprites
+    for alien in config.alien_stats:
+        atlas.initialize_animation(alien.sprite_name, 32, 32, 1, color_key=config.transparent_color)
     atlas.initialize_animation("ufo", 64, 64, 1, color_key=config.transparent_color)
 
     # alien bullet frames
@@ -273,6 +275,7 @@ class SpriteAtlas:
     @staticmethod
     def _fetch(name, location):
         if name not in location:
+            print("could not find sprite '{}' in atlas".format(name))
             raise SpriteNotFoundException(name)
         return location[name]
 

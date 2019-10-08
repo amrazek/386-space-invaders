@@ -54,6 +54,14 @@ default_alien_bullet = BulletStats(
 fleet_drop_speed = 0
 initial_point_value = 50
 
+alien_stats = [
+    AlienStats(sprite_name="alien1", points=10),
+    AlienStats(sprite_name="alien2", points=15),
+    AlienStats(sprite_name="alien3", points=20),
+    AlienStats(sprite_name="alien4", points=25)
+]
+
+
 # Bunker settings
 bunker_tile_size = 32
 bunker_count = 3

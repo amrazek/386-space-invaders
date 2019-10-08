@@ -40,7 +40,7 @@ class Animation(Sprite):
     def update(self, elapsed):
         self.accumulator += elapsed
 
-        while self.accumulator >= self._time_per_frame:
+        while 0.0 < self._time_per_frame <= self.accumulator:
             self.accumulator -= self._time_per_frame
             self.next_frame()
 
@@ -67,6 +67,14 @@ class Animation(Sprite):
     @property
     def mask(self):
         return self.current_mask
+
+    def __copy__(self):
+        """Want a shallow copy essentially (to avoid creating duplicate surfaces in memory
+            yet also not include references to changing things, like Rect"""
+        inst = Animation(self.frames, self.duration)
+        inst.rect = self.rect.copy()
+
+        return inst
 
 
 class StaticAnimation(Animation):

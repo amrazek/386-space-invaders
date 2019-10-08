@@ -47,11 +47,15 @@ class Scoreboard:
     def __refresh_ships(self):
         """Show how many ships are left."""
         self.ships = Group()
+
+        temp = []
+
         for ship_number in range(self.stats.ships_left):
-            ship = Ship(self.stats, None)
+            ship = config.atlas.load_static("ship_no_engines")
             ship.rect.x = config.screen_width - (ship_number + 1) * ship.rect.width
             ship.rect.y = 10
             self.ships.add(ship)
+            temp.append(ship)
 
     def set_dirty(self):
         self._dirty = True
