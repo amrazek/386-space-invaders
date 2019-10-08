@@ -1,5 +1,6 @@
 from states.game_state import GameState
 from states.game_over import GameOver
+from states.high_score import EnterHighScore
 from animation import OneShotAnimation
 
 import config

@@ -126,7 +126,9 @@ class HighScore(GameState):
 
     def save_high_scores(self):
         """Saves high scores to disk"""
-
+        if not os.path.exists('data'):
+            os.mkdir('data')
+            
         path = os.path.join('data', HighScore.HIGH_SCORE_FILE)
         file = open(path, 'wt')
 
@@ -138,13 +140,13 @@ class HighScore(GameState):
 
 class EnterHighScore(GameState):
     """Allows player to enter a new high score"""
-    def __init__(self, input_state, game_stats: SessionStats, high_scores: HighScore):
+    def __init__(self, input_state, game_stats: SessionStats):
         super().__init__(input_state)
 
         self.stats = game_stats
         self.font = pygame.font.SysFont(None, 48)
         self.prompt_group = pygame.sprite.Group()
-        self.high_score_state = high_scores
+        self.high_score_state = HighScore(self.input_state, game_stats)
 
         new_high_score = self.font.render("New high score!", True, config.text_color)
         new_high_score = StaticAnimation(new_high_score)
@@ -162,7 +164,7 @@ class EnterHighScore(GameState):
 
         # if this is not a new high score, this state will just transition directly to displaying the
         # high score list
-        self.done = not high_scores.is_new_high_score(game_stats.score)
+        self.done = not self.high_score_state.is_new_high_score(game_stats.score)
 
     def update(self, elapsed):
         if self.done:

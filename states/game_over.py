@@ -1,9 +1,12 @@
 import pygame
 from states.game_state import GameState
+from states.high_score import EnterHighScore
 import config
 
 
 class GameOver(GameState):
+    DURATION = 1.0
+
     def __init__(self, input_state, previous_state):
         super().__init__(input_state)
 
@@ -34,8 +37,10 @@ class GameOver(GameState):
         self.dialog.blit(font_surf, dest=blit_rect)
         self.dialog_rect.center = config.screen_rect.center
 
+        self.elapsed = 0.0
+
     def update(self, elapsed):
-        pass  # todo: check for button? key?
+        self.elapsed += elapsed
 
     def draw(self, screen):
         self.previous_state.draw(screen, draw_ship=False)
@@ -43,7 +48,7 @@ class GameOver(GameState):
 
     @property
     def finished(self):
-        return False
+        return self.elapsed > GameOver.DURATION
 
     def get_next(self):
-        return None
+        return EnterHighScore(self.input_state, self.previous_state.stats)
