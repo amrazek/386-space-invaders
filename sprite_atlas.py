@@ -11,8 +11,9 @@ import config
 def load_atlas():
     atlas = SpriteAtlas(os.path.join('images', 'atlas.png'))
 
-    atlas.initialize_static("ship", color_key=config.transparent_color, override_width=48)
+    atlas.initialize_static("ship", color_key=config.transparent_color, override_width=48)  # used for explosion
     atlas.initialize_static("player_bullet", color_key=config.transparent_color, generate_mask=True)
+    atlas.initialize_static("bunker", color_key=config.transparent_color, generate_mask=True)
     atlas.initialize_static("selector", color_key=config.transparent_color)
     atlas.initialize_static("ship_no_engines", color_key=config.transparent_color)
 

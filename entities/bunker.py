@@ -4,44 +4,6 @@ from pygame.sprite import Sprite
 import config
 
 
-def generate_bunker_surface():
-    tile_size = config.bunker_tile_size
-
-    wh = (tile_size * 3, tile_size * 2)
-
-    surf = pygame.Surface(wh)
-
-    bkg = config.transparent_color
-    surf.fill(bkg)
-    surf.set_colorkey(bkg)
-
-    # fill bottom two-thirds of bunker
-    r = surf.get_rect()
-    r.height -= tile_size
-    r.bottom = surf.get_height()
-    surf.fill(config.bunker_color, r)
-
-    # fill top tile between the two "legs"
-    surf.fill(config.bunker_color, pygame.Rect(tile_size, 0, tile_size, tile_size))
-
-    # left circle to create rounded "left shoulder"
-    r.width, r.height = tile_size * 2, tile_size * 2
-    r.center = (tile_size, tile_size)
-    pygame.draw.circle(surf, config.bunker_color, r.center, tile_size)
-
-    # right circle
-    r.center = (surf.get_width() - tile_size, r.centery)
-    pygame.draw.circle(surf, config.bunker_color, r.center, tile_size)
-
-    # clip out the bottom square which is not part of the bunker
-    r.width, r.height = tile_size, tile_size
-    r.left, r.bottom = tile_size, surf.get_height()
-
-    surf.fill(bkg, r)
-
-    return surf.convert()
-
-
 class BunkerFragment(Sprite):
     def __init__(self, surf, center_position):
         super().__init__()
@@ -103,7 +65,8 @@ class Bunker:
     def __init__(self, center_position, player_bullets, enemy_bullets):
         super().__init__()
 
-        img = generate_bunker_surface()
+        #img = generate_bunker_surface()
+        img = config.atlas.load_static("bunker").image
 
         fragments = Bunker._create_bunker_fragments(img, center_position)
         self._fragments = pygame.sprite.Group(fragments)
@@ -154,15 +117,14 @@ class Bunker:
         for x in range(0, surf.get_rect().width, config.bunker_tile_size):
             for y in range(0, surf.get_rect().height, config.bunker_tile_size):
                 slice_surf = pygame.Surface(src_rect.size)
+                slice_surf.fill(config.transparent_color)
                 slice_surf.blit(surf, dest_rect, src_rect)
-
-                slice_surf.set_colorkey(config.transparent_color)
 
                 # avoid creating blank slices by making sure the tile has some content
                 threshold = pygame.transform.threshold(None, slice_surf, surf.get_colorkey(), set_behavior=0)
                 slice_surf.set_colorkey(config.transparent_color)
 
-                if threshold < dest_rect.width * dest_rect.height * 0.33:  # less than 33% transparent
+                if threshold < dest_rect.width * dest_rect.height * 0.5:  # less than 50% transparent
                     r = src_rect.copy()
                     r.left -= surf.get_width() // 2
                     r.top -= surf.get_height() // 2

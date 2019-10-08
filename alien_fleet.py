@@ -27,7 +27,6 @@ class AlienFleet:
         self.create_new_fleet()
 
         self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
-        print("next ufo: ", self.next_ufo_appearance)
 
         # temp
         self.bullet_elapsed = 999.0
@@ -191,33 +190,26 @@ class AlienFleet:
             # if ufo has moved off-screen, delete it without explosion or points
             if ufo.speed < 0.0 and ufo.rect.right - ufo.rect.width < 0:
                 self.ufos.remove(ufo)
-                print("ufo offscreen")
             elif ufo.speed > 0.0 and ufo.rect.left - ufo.rect.width > config.screen_width:
                 self.ufos.remove(ufo)
-                print("ufo offscreen")
 
     def _fire_alien_bullet(self, alien):
         self.bullet_elapsed = 0.0
 
-        # *** temp  ***
+        # create new animation for this bullet
+        bullet_anim = config.atlas.load_animation("alien_bullet")
 
-        # temp: create bullet from every alien
-        for alien in self.aliens:
-            # create new animation for this bullet
-            bullet_anim = config.atlas.load_animation("alien_bullet")
+        # calculate bullet center position
+        # it should align with the BOTTOM of the alien
+        r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)
+        r.bottom = alien.rect.bottom
+        r.centerx = alien.rect.centerx
 
-            # calculate bullet center position
-            # it should align with the BOTTOM of the alien
-            r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)
-            r.bottom = alien.rect.bottom
-            r.centerx = alien.rect.centerx
+        bullet = Bullet(self.session_stats.alien_bullet, r.center, bullet_anim)
 
-            bullet = Bullet(self.session_stats.alien_bullet, r.center, bullet_anim)
-
-            self.alien_bullets.add(bullet)
+        self.alien_bullets.add(bullet)
 
     def _spawn_ufo(self):
-        print("spawning ufo")
         self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
 
         ufo = Ufo(self.session_stats, config.atlas.load_animation("ufo"))
