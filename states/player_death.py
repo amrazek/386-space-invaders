@@ -16,8 +16,7 @@ class PlayerDeath(GameState):
         self.explosion.rect.center = running_game.ship.rect.center
 
         self.running_game = running_game
-
-        self.ran = False
+        self.next_state = None
 
     def update(self, elapsed):
         self.running_game.update(0.)
@@ -29,14 +28,12 @@ class PlayerDeath(GameState):
 
     @property
     def finished(self):
-        return self.ran
+        return self.next_state is not None
 
     def get_next(self):
-        return self.running_game
+        return self.next_state
 
     def explosion_callback(self):
-        self.ran = True
-
         if self.running_game.stats.ships_left > 0:
 
             # Reduce player lives
@@ -53,7 +50,8 @@ class PlayerDeath(GameState):
             self.running_game.alien_bullets.empty()
 
             self.running_game.next_state = None  # clear next state so game continues
+            self.next_state = self.running_game
         else:
-            self.running_game.next_state = GameOver(self.input_state, self.running_game)
+            self.next_state = GameOver(self.input_state, self.running_game)
 
         self.running_game.scoreboard.set_dirty()

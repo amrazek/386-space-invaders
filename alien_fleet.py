@@ -54,7 +54,7 @@ class AlienFleet:
         # *** temp  ***
         self.bullet_elapsed += elapsed
 
-        if self.bullet_elapsed > 5.0:
+        if self.bullet_elapsed > 1.0:
             self._fire_alien_bullet(None)
 
     def draw(self, screen):

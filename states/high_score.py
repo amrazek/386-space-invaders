@@ -36,7 +36,7 @@ class HighScore(GameState):
         self.done = False
 
     def update(self, elapsed):
-        if any(self.input_state.key_codes):
+        if any(self.input_state.key_codes) or self.input_state.left_down:
             self.done = True
 
     def draw(self, screen):
@@ -187,8 +187,7 @@ class EnterHighScore(GameState):
                     self.high_score_state.save_high_scores()
                 else:
                     print("name denied: need 3 letters")  # todo: error sound?
-            # apparently pygame doesn't have a name for uppercase letters, so this is a bit ugly...
-            elif len(self.entered_name) < 3 and (('a' <= chr(key_code) <= 'z') or ('A' <= chr(key_code) <= 'Z')):
+            elif len(self.entered_name) < 3 and self._is_accepted_key_code(key_code):
                 letter = chr(key_code)
                 self.entered_name += letter
                 self._update_name_image()
@@ -197,6 +196,11 @@ class EnterHighScore(GameState):
         screen.fill(config.bg_color)
         self.prompt_group.draw(screen)
         screen.blit(self.entered_name_image, self.entered_name_rect)
+
+    @staticmethod
+    def _is_accepted_key_code(kc):
+        kc = chr(kc)
+        return 'a' <= kc <= 'z' or 'A' <= kc <= 'Z' or '0' <= kc <= '9'
 
     @property
     def finished(self):

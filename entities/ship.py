@@ -26,7 +26,8 @@ class Ship(Sprite):
         self.center = float(self.rect.centerx)
 
         self.last_shot = 0
-        self.min_time_between_shots = round(1000.0 / stats.bullets_per_second)
+        self.min_time_between_shots = 1. / stats.bullets_per_second
+        self.wait_time_to_shoot = 0.0
 
     def update(self, input_state, elapsed):
         # update ship's position, not its rect
@@ -44,21 +45,24 @@ class Ship(Sprite):
         self.animation.update(elapsed)
         self.image = self.animation.image
 
+        # update passing time
+        self.wait_time_to_shoot -= elapsed
+
     def center_ship(self):
         """Center the ship on the screen"""
         self.center = self.screen_rect.centerx
 
     def fire(self):
-        current_tick = pygame.time.get_ticks()
+        if self.wait_time_to_shoot > 0.:
+            return
 
-        if current_tick - self.last_shot >= self.min_time_between_shots:
-            self.last_shot = current_tick
+        self.wait_time_to_shoot = self.min_time_between_shots
 
-            bullet_anim = config.atlas.load_static("player_bullet")
-            r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)
-            r.top = self.rect.top
-            r.centerx = self.rect.centerx
+        bullet_anim = config.atlas.load_static("player_bullet")
+        r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)
+        r.top = self.rect.top
+        r.centerx = self.rect.centerx
 
-            bullet = Bullet(self.stats.player_bullet, r.center, bullet_anim)
+        bullet = Bullet(self.stats.player_bullet, r.center, bullet_anim)
 
-            self.bullet_manager.add(bullet)
+        self.bullet_manager.add(bullet)
