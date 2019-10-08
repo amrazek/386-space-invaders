@@ -48,11 +48,10 @@ default_alien_bullet = BulletStats(
     width=6,
     height=12,
     speed=-60.0,
-    color=Color(0, 255, 0))
+    color=Color('green'))
 
 # Alien settings
 fleet_drop_speed = 0
-initial_point_value = 50
 
 alien_stats = [
     AlienStats(sprite_name="alien1", points=10),
@@ -60,6 +59,8 @@ alien_stats = [
     AlienStats(sprite_name="alien3", points=20),
     AlienStats(sprite_name="alien4", points=25)
 ]
+
+ufo_stats = AlienStats(sprite_name="ufo", points=500)
 
 
 # Bunker settings

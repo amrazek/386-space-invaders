@@ -68,8 +68,8 @@ class RunGame(GameState):
     def _player_destroyed(self):
         self.next_state = self.next_state or PlayerDeath(self.input_state, self)
 
-    def _on_alien_killed(self):
-        self.stats.increase_score(self.stats.alien_points)
+    def _on_alien_killed(self, alien):
+        self.stats.increase_score(alien.alien_stats.points)
         self.scoreboard.set_dirty()
 
     def _on_fleet_destroyed(self):

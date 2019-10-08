@@ -13,22 +13,22 @@ class Menu(GameState):
 
     def __init__(self, input_state):
         super().__init__(input_state)
-        font = pygame.font.SysFont(None, 48)
+        self.font = pygame.font.SysFont(None, 48)
 
         # create "Space Invaders" logo
-        self.title = StaticAnimation(font.render("Space Invaders", True, config.text_color))
+        self.title = StaticAnimation(self.font.render("Space Invaders", True, config.text_color))
         self.title.rect.centerx = config.screen_rect.centerx
         self.title.rect.centery = config.screen_height // 8
 
         last_y = config.screen_height - config.screen_height // 3
         self.options = Group()
-        font = pygame.font.SysFont(None, Menu.MenuItemSize)
+        self.font = pygame.font.SysFont(None, Menu.MenuItemSize)
 
         # create options
         for option in [("Play Space Invaders", self._play_game),
                        ("High Scores", self._view_high_scores),
                        ("Quit", self._quit)]:
-            option_sprite = StaticAnimation(font.render(option[0], True, config.text_color))
+            option_sprite = StaticAnimation(self.font.render(option[0], True, config.text_color))
             option_sprite.callback = option[1]
 
             option_sprite.rect.centerx = self.title.rect.centerx
@@ -50,10 +50,18 @@ class Menu(GameState):
         # point values for aliens
         self.aliens = Group()
 
-        ufo = config.atlas.load_animation("ufo")
+        y_pos = self.title.rect.bottom + 50
 
+        for alien_stats in config.alien_stats:
+            alien = config.atlas.load_animation(alien_stats.sprite_name).frames[0]
+            spr = self._create_point_sprite(alien, alien_stats.points, y_pos)
+            self.aliens.add(spr)
+            y_pos = spr.rect.bottom + 10
 
-        self.aliens.add(ufo)
+        ufo = config.atlas.load_animation("ufo").frames[0]
+        spr = self._create_point_sprite(ufo, "???", y_pos)
+
+        self.aliens.add(spr)
 
         # finish creating state values
         self.next_state = None
@@ -143,3 +151,26 @@ class Menu(GameState):
             else:
                 # right selector
                 selector.rect.left = option_rect.right + 6
+
+    def _create_point_sprite(self, alien_surf, point_value, top_coord):
+        point_value = self.font.render("{} Points".format(point_value), True, config.text_color)
+        alien_rect = alien_surf.get_rect()
+
+        surf = pygame.Surface((alien_rect.width + point_value.get_width() + 20,
+                               max(alien_rect.height, point_value.get_height())))
+
+        # center alien rect vertically
+        alien_rect.centery = surf.get_height() // 2
+        surf.blit(alien_surf, alien_rect)
+
+        r = point_value.get_rect()
+        r.left = alien_rect.width + 20
+        r.centery = alien_rect.centery
+        surf.blit(point_value, r)
+
+        sprite = StaticAnimation(surf)
+
+        sprite.rect.top = top_coord
+        sprite.rect.centerx = self.title.rect.centerx
+
+        return sprite

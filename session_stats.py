@@ -15,12 +15,11 @@ class SessionStats:
         self.fleet_direction = 1
 
         # Scoring
-        self.alien_points = 50
+        self.alien_stats = deepcopy(config.alien_stats)
 
         # initial values
         self.level, self.score = 0, 0
         self.ships_left = config.ship_limit
-        self.alien_points = config.initial_point_value  # points per alien killed
 
         self.player_bullet = deepcopy(config.default_player_bullet)
         self.alien_bullet = deepcopy(config.default_alien_bullet)
@@ -51,9 +50,12 @@ class SessionStats:
     def __increase_speed(self):
         """Increase speed settings."""
         self.ship_speed *= config.speedup_scale
-        self.bullet_speed *= config.speedup_scale
+        self.player_bullet.speed *= config.speedup_scale
+        self.alien_bullet.speed *= config.speedup_scale
         self.bullets_per_second *= config.speedup_scale
         self.alien_speed *= config.speedup_scale
-        self.alien_points = int(self.alien_points * config.score_scale)
+
+        for stats in self.alien_stats:
+            stats.points = int(stats.points * config.score_scale)
 
         # todo: increase alien bullet speed, drop rate, etc?
