@@ -2,6 +2,7 @@ import os
 from typing import NamedTuple
 import pygame
 from states.game_state import GameState
+from states.menu import Menu
 from session_stats import SessionStats
 from animation import StaticAnimation
 import config
@@ -34,8 +35,11 @@ class HighScore(GameState):
         self.score_group = pygame.sprite.Group()
         self._update_high_score_list()
 
+        self.done = False
+
     def update(self, elapsed):
-        pass  # todo: exit to main menu condition here
+        if any(self.input_state.key_codes):
+            self.done = True
 
     def draw(self, screen):
         screen.fill(config.bg_color)
@@ -44,10 +48,10 @@ class HighScore(GameState):
 
     @property
     def finished(self):
-        return False
+        return self.done
 
     def get_next(self):
-        raise NotImplementedError
+        return Menu(self.input_state)
 
     def _update_high_score_list(self):
         high_score_rect = pygame.Rect(0, 0, config.screen_width // 3, self.high_score_rect.height)
@@ -128,7 +132,7 @@ class HighScore(GameState):
         """Saves high scores to disk"""
         if not os.path.exists('data'):
             os.mkdir('data')
-            
+
         path = os.path.join('data', HighScore.HIGH_SCORE_FILE)
         file = open(path, 'wt')
 
@@ -203,5 +207,5 @@ class EnterHighScore(GameState):
         return self.high_score_state
 
     def _update_name_image(self):
-        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name, True, config.text_color)
+        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name.ljust(3, '_'), True, config.text_color)
         self.entered_name_rect = self.entered_name_rect or self.entered_name_image.get_rect()

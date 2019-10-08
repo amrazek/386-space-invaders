@@ -192,6 +192,10 @@ class SpriteAtlas:
         self.animations = {}
         self.statics = {}  # statics aren't initialized to anything by default so user can specify color key if wanted
 
+    @property
+    def sprite_names(self):
+        return list(self._sprite_rects.keys())
+
     def initialize_animation(self, name, frame_width, frame_height, duration, color_key=None, generate_masks=False):
         if name in self.animations:
             return self.animations[name]
@@ -271,3 +275,10 @@ class SpriteAtlas:
         r.left, r.top, r.width, r.height = [int(x) for x in rect_str.split(' ')]
 
         return r
+
+    @staticmethod
+    def initialize_from_dir(path):
+        assert os.path.exists(path)
+        assert os.path.isdir(path)
+
+        raise NotImplementedError
