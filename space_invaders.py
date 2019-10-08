@@ -1,7 +1,5 @@
 import pygame
 from states.menu import Menu
-from states.run_game import RunGame
-from states.high_score import HighScore, EnterHighScore
 from states.input_state import InputState
 from timer import game_timer
 from sprite_atlas import load_atlas
@@ -20,9 +18,6 @@ def run_game():
 
     # init game
     input_state = InputState()
-    #game_state = RunGame(input_state)
-    # game_state = HighScore(input_state, game_state.stats)
-    # game_state = EnterHighScore(input_state, game_state.stats, game_state)
     game_state = Menu(input_state)
 
     # start main loop for the game

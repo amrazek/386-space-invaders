@@ -210,5 +210,6 @@ class EnterHighScore(GameState):
         return self.high_score_state
 
     def _update_name_image(self):
-        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name.ljust(3, '_'), True, config.text_color)
+        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name.ljust(3, '_'), True,
+                                                   config.text_color)
         self.entered_name_rect = self.entered_name_rect or self.entered_name_image.get_rect()

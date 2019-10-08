@@ -65,7 +65,6 @@ class Bunker:
     def __init__(self, center_position, player_bullets, enemy_bullets):
         super().__init__()
 
-        #img = generate_bunker_surface()
         img = config.atlas.load_static("bunker").image
 
         fragments = Bunker._create_bunker_fragments(img, center_position)

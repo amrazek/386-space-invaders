@@ -112,7 +112,8 @@ def generate_explosion_frames(from_surf, num_frames, duration, min_velocity, max
             x, y = int(pixel.position.x), int(pixel.position.y)
 
             if from_surf.unmap_rgb(original_pixels[x, y]) == from_surf.get_colorkey():
-                pixel.color = pygame.Color(255, 0, 255, 0)
+                pixel.color = pygame.Color('magenta')
+                pixel.color.r, pixel.color.g, pixel.color.b, pixel.color.a = 255, 0, 255, 0
 
     elapsed = 0.0
 

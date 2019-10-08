@@ -67,6 +67,8 @@ class Menu(GameState):
         self.next_state = None
         self._set_selected(0)
 
+        pygame.mouse.set_visible(True)
+
     def update(self, elapsed):
         self.options.update(elapsed)
         self.selectors.update(elapsed)
@@ -94,6 +96,7 @@ class Menu(GameState):
 
     def _play_game(self):
         self.next_state = RunGame(self.input_state)
+        pygame.mouse.set_visible(False)
 
     def _view_high_scores(self):
         self.next_state = HighScore(self.input_state)

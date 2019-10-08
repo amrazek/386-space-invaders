@@ -1,6 +1,5 @@
 import pygame.font
 from pygame.sprite import Group
-from entities.ship import Ship
 import config
 
 
