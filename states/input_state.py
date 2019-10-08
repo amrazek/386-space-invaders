@@ -5,7 +5,7 @@ from pygame.locals import *
 
 class InputState:
     def __init__(self):
-        self.left, self.right, self.fire = False, False, False
+        self.left, self.right, self.up, self.down, self.fire = False, False, False, False, False
         self.quit = False
 
         self.left_down = False
@@ -15,6 +15,8 @@ class InputState:
             K_ESCAPE: self.__quit,
             K_LEFT: self.__left,
             K_RIGHT: self.__right,
+            K_UP: self.__up,
+            K_DOWN: self.__down,
             K_SPACE: self.__fire
         }
 
@@ -28,6 +30,12 @@ class InputState:
 
     def __right(self, state):
         self.right = state
+
+    def __up(self, state):
+        self.up = state
+
+    def __down(self, state):
+        self.down = state
 
     def __fire(self, state):
         self.fire = state

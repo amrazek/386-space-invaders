@@ -2,7 +2,6 @@ import os
 from typing import NamedTuple
 import pygame
 from states.game_state import GameState
-from states.menu import Menu
 from session_stats import SessionStats
 from animation import StaticAnimation
 import config
@@ -17,10 +16,9 @@ class HighScore(GameState):
     """Displays game high scores"""
     HIGH_SCORE_FILE = 'high_scores.txt'
 
-    def __init__(self, input_state, game_stats: SessionStats):
+    def __init__(self, input_state):
         super().__init__(input_state)
 
-        self.stats = game_stats
         self.font = pygame.font.SysFont(None, 48)
         self.high_scores = []
         self._load_high_scores()
@@ -51,7 +49,8 @@ class HighScore(GameState):
         return self.done
 
     def get_next(self):
-        return Menu(self.input_state)
+        import states.menu
+        return states.menu.Menu(self.input_state)
 
     def _update_high_score_list(self):
         high_score_rect = pygame.Rect(0, 0, config.screen_width // 3, self.high_score_rect.height)
@@ -150,7 +149,7 @@ class EnterHighScore(GameState):
         self.stats = game_stats
         self.font = pygame.font.SysFont(None, 48)
         self.prompt_group = pygame.sprite.Group()
-        self.high_score_state = HighScore(self.input_state, game_stats)
+        self.high_score_state = HighScore(self.input_state)
 
         new_high_score = self.font.render("New high score!", True, config.text_color)
         new_high_score = StaticAnimation(new_high_score)

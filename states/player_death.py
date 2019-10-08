@@ -1,6 +1,5 @@
-from states.game_state import GameState
-from states.game_over import GameOver
-from states.high_score import EnterHighScore
+from .game_state import GameState
+from .game_over import GameOver
 from animation import OneShotAnimation
 
 import config
@@ -58,4 +57,3 @@ class PlayerDeath(GameState):
             self.running_game.next_state = GameOver(self.input_state, self.running_game)
 
         self.running_game.scoreboard.set_dirty()
-

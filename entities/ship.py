@@ -13,10 +13,10 @@ class Ship(Sprite):
         self.bullet_manager = bullet_manager
 
         # load the ship image and get its rect
-        self.image = config.atlas.load_static("ship").image
-
+        self.animation = config.atlas.load_animation("ship")
+        self.image = self.animation.image
         self.rect = self.image.get_rect()
-        self.screen_rect = pygame.Rect(0, 0, config.screen_width, config.screen_height)
+        self.screen_rect = config.screen_rect
 
         # start each new ship at the bottom center of the screen
         self.rect.centerx = self.screen_rect.centerx
@@ -39,6 +39,10 @@ class Ship(Sprite):
 
         # Update rect object from self.center.y
         self.rect.centerx = self.center
+
+        # update ship animation
+        self.animation.update(elapsed)
+        self.image = self.animation.image
 
     def center_ship(self):
         """Center the ship on the screen"""

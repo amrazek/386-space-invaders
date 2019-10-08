@@ -1,5 +1,6 @@
 alien = 132 0 60 58
 alien1 = 0 0 128 64
 alien2 = 0 68 128 64
-player_bullet = 132 114 6 12
-ship = 132 62 60 48
+player_bullet = 132 98 6 12
+selector = 132 62 32 32
+ship = 0 136 96 32

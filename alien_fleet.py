@@ -153,7 +153,7 @@ class AlienFleet:
             for aliens in collisions.values():
                 for an_alien in aliens:
                     self._create_alien_explosion(an_alien)
-                    self.on_kill(an_alien)
+                    self.on_kill()
 
         if len(self.aliens) == 0:
             # If the entire fleet is destroyed, start a new level

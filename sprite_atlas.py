@@ -11,8 +11,10 @@ import config
 def load_atlas():
     atlas = SpriteAtlas(os.path.join('images', 'atlas.png'))
 
-    atlas.initialize_static("ship", color_key=config.transparent_color, generate_mask=True)
+    atlas.initialize_static("ship", color_key=config.transparent_color, override_width=48)
     atlas.initialize_static("player_bullet", color_key=config.transparent_color, generate_mask=True)
+    atlas.initialize_static("selector", color_key=config.transparent_color)
+    atlas.initialize_animation("ship", 48, 32, 0.25, color_key=config.transparent_color)
     atlas.initialize_animation("alien1", 64, 64, 5, color_key=config.transparent_color)
     atlas.initialize_animation("alien2", 64, 64, 1, color_key=config.transparent_color)
 
@@ -25,9 +27,6 @@ def load_atlas():
     atlas.initialize_animation_from_frames("ship_explosion", frames, .5)
 
     # explosion frames for aliens
-    keys = atlas.animations.keys()
-    alien_keys = [k for k in atlas.animations.keys() if k.startswith("alien")]
-
     for key in [k for k in atlas.animations.keys() if k.startswith("alien")]:
         frames = generate_explosion_frames(atlas.load_animation(key).image, 4, 1, 2, 8)
         atlas.initialize_animation_from_frames(key + "_explosion", frames, .25)
@@ -231,8 +230,14 @@ class SpriteAtlas:
 
         self.animations[name] = animation
 
-    def initialize_static(self, name, color_key=None, generate_mask=False):
+    def initialize_static(self, name, color_key=None, generate_mask=False, override_width=None, override_height=None):
         rect = self._fetch(name, self._sprite_rects)
+
+        if override_width or override_height:
+            rect = rect.copy()  # don't affect original dimensions
+
+        rect.width = override_width or rect.width
+        rect.height = override_height or rect.height
 
         surf = self.atlas.subsurface(rect)
 
