@@ -1,7 +1,6 @@
 from .game_state import GameState
 from .game_over import GameOver
 from animation import OneShotAnimation
-
 import config
 
 

@@ -31,6 +31,7 @@ def run_game():
 
         if game_state.finished:
             game_state = game_state.get_next()
+            game_timer.reset()
 
 
 run_game()

@@ -4,6 +4,7 @@ import pygame
 from states.game_state import GameState
 from session_stats import SessionStats
 from animation import StaticAnimation
+from starfield import Starfield
 import config
 
 
@@ -16,11 +17,13 @@ class HighScore(GameState):
     """Displays game high scores"""
     HIGH_SCORE_FILE = 'high_scores.txt'
 
-    def __init__(self, input_state):
+    def __init__(self, input_state, starfield=None):
         super().__init__(input_state)
 
         self.font = pygame.font.SysFont(None, 48)
         self.high_scores = []
+        self.starfield = starfield or Starfield()
+
         self._load_high_scores()
 
         # create high score text
@@ -38,9 +41,14 @@ class HighScore(GameState):
     def update(self, elapsed):
         if any(self.input_state.key_codes) or self.input_state.left_down:
             self.done = True
+            self.input_state.key_codes.clear()
+            self.input_state.left_down = False
+
+        self.starfield.update(elapsed)
 
     def draw(self, screen):
         screen.fill(config.bg_color)
+        self.starfield.draw(screen)
         screen.blit(self.high_score_image, self.high_score_rect)
         self.score_group.draw(screen)
 
@@ -50,7 +58,7 @@ class HighScore(GameState):
 
     def get_next(self):
         import states.menu
-        return states.menu.Menu(self.input_state)
+        return states.menu.Menu(self.input_state, self.starfield)
 
     def _update_high_score_list(self):
         high_score_rect = pygame.Rect(0, 0, config.screen_width // 3, self.high_score_rect.height)
@@ -143,13 +151,14 @@ class HighScore(GameState):
 
 class EnterHighScore(GameState):
     """Allows player to enter a new high score"""
-    def __init__(self, input_state, game_stats: SessionStats):
+    def __init__(self, input_state, game_stats: SessionStats, starfield=None):
         super().__init__(input_state)
 
         self.stats = game_stats
         self.font = pygame.font.SysFont(None, 48)
         self.prompt_group = pygame.sprite.Group()
         self.high_score_state = HighScore(self.input_state)
+        self.starfield = starfield or Starfield()
 
         new_high_score = self.font.render("New high score!", True, config.text_color)
         new_high_score = StaticAnimation(new_high_score)
@@ -174,6 +183,7 @@ class EnterHighScore(GameState):
             return
 
         self.prompt_group.update(elapsed)
+        self.starfield.update(elapsed)
 
         # check for any new key inputs
         for key_code in self.input_state.key_codes:
@@ -194,6 +204,7 @@ class EnterHighScore(GameState):
 
     def draw(self, screen):
         screen.fill(config.bg_color)
+        self.starfield.draw(screen)
         self.prompt_group.draw(screen)
         screen.blit(self.entered_name_image, self.entered_name_rect)
 

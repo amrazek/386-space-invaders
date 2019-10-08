@@ -5,18 +5,21 @@ from .game_state import GameState
 from states.run_game import RunGame
 from .high_score import HighScore
 from animation import StaticAnimation
+from starfield import Starfield
 
 
 class Menu(GameState):
+    TitleSize = 48
     MenuItemSize = 32
     MenuItemSpacing = 16
 
-    def __init__(self, input_state):
+    def __init__(self, input_state, starfield=None):
         super().__init__(input_state)
-        self.font = pygame.font.SysFont(None, 48)
+        self.font = pygame.font.SysFont(None, Menu.TitleSize)
+        self.starfield = starfield or Starfield()
 
         # create "Space Invaders" logo
-        self.title = StaticAnimation(self.font.render("Space Invaders", True, config.text_color))
+        self.title = StaticAnimation(self.font.render("Space Invaders", True, config.green_color))
         self.title.rect.centerx = config.screen_rect.centerx
         self.title.rect.centery = config.screen_height // 8
 
@@ -38,7 +41,6 @@ class Menu(GameState):
             self.options.add(option_sprite)
 
         # create a small sprite to use as menu item selector
-
         left_selector = config.atlas.load_static("selector")
 
         # need to flip the arrow...
@@ -70,6 +72,7 @@ class Menu(GameState):
         pygame.mouse.set_visible(True)
 
     def update(self, elapsed):
+        self.starfield.update(elapsed)
         self.options.update(elapsed)
         self.selectors.update(elapsed)
         self.aliens.update(elapsed)
@@ -81,6 +84,7 @@ class Menu(GameState):
     def draw(self, screen):
         screen.fill(config.bg_color)
 
+        self.starfield.draw(screen)
         screen.blit(self.title.image, self.title.rect)
 
         self.aliens.draw(screen)
@@ -99,7 +103,7 @@ class Menu(GameState):
         pygame.mouse.set_visible(False)
 
     def _view_high_scores(self):
-        self.next_state = HighScore(self.input_state)
+        self.next_state = HighScore(self.input_state, self.starfield)
 
     def _quit(self):
         self.input_state.quit = True
@@ -129,6 +133,7 @@ class Menu(GameState):
 
                 if self.input_state.left_down:
                     option.callback()
+                    self.input_state.left_down = False
 
                 break
 

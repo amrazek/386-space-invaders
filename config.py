@@ -24,6 +24,7 @@ screen_width = 1000
 screen_height = 600
 bg_color = (0, 0, 0)
 text_color = (255, 255, 255)
+green_color = (0, 240, 0)
 screen_rect = Rect(0, 0, screen_width, screen_height)
 transparent_color = (255, 0, 255)
 

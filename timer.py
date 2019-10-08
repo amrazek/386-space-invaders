@@ -24,5 +24,9 @@ class Timer:
     def elapsed(self):
         return self._elapsed
 
+    def reset(self):
+        self._last_tick = pygame.time.get_ticks()
+        self._elapsed = 0.0
+
 
 game_timer = Timer()
