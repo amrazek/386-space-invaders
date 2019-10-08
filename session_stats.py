@@ -16,6 +16,7 @@ class SessionStats:
 
         # Scoring
         self.alien_stats = deepcopy(config.alien_stats)
+        self.ufo_stats = deepcopy(config.ufo_stats)
 
         # initial values
         self.level, self.score = 0, 0
@@ -57,5 +58,7 @@ class SessionStats:
 
         for stats in self.alien_stats:
             stats.points = int(stats.points * config.score_scale)
+
+        self.ufo_stats.points = int(self.ufo_stats.points * config.score_scale)
 
         # todo: increase alien bullet speed, drop rate, etc?

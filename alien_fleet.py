@@ -1,15 +1,18 @@
+import random
+import copy
 import pygame
 from pygame.sprite import Group
 from entities.alien import Alien
+from entities.ufo import Ufo
 from entities.bullet import Bullet
 from animation import OneShotAnimation
 import config
 
 
 class AlienFleet:
-    def __init__(self, stats, ship, player_bullets, alien_bullets,
+    def __init__(self, session_stats, ship, player_bullets, alien_bullets,
                  on_clear_callback, on_kill_callback, on_player_collision_callback):
-        self.stats = stats
+        self.session_stats = session_stats
         self.ship = ship
         self.player_bullets = player_bullets
         self.alien_bullets = alien_bullets
@@ -18,17 +21,23 @@ class AlienFleet:
         self.on_player_collision = on_player_collision_callback
 
         self.aliens = Group()
+        self.ufos = Group()
 
         self.explosions = Group()
         self.create_new_fleet()
+
+        self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
+        print("next ufo: ", self.next_ufo_appearance)
 
         # temp
         self.bullet_elapsed = 999.0
 
     def update(self, elapsed):
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
-        self.__check_fleet_edges()
+        self._check_fleet_edges()
+        self._check_ufo_offscreen()
         self.aliens.update(elapsed)
+        self.ufos.update(elapsed)
         self.explosions.update(elapsed)
 
         # Look for alien-ship collisions
@@ -45,6 +54,11 @@ class AlienFleet:
         if pygame.sprite.spritecollideany(self.ship, self.alien_bullets):
             self.on_player_collision()
 
+        # spawn new ufo, if needed
+        self.next_ufo_appearance -= elapsed
+        if self.next_ufo_appearance < 0:
+            self._spawn_ufo()
+
         # todo: fix case where aliens spawn outside screen
         for alien in self.aliens:
             if alien.rect.right > config.screen_width:
@@ -59,17 +73,19 @@ class AlienFleet:
 
     def draw(self, screen):
         self.aliens.draw(screen)
+        self.ufos.draw(screen)
         self.explosions.draw(screen)
 
     def create_new_fleet(self):
         """Create a full fleet of aliens"""
         # Create an alien and find the number of aliens in a row.
-        alien = Alien(self.stats, config.atlas.load_animation(self.stats.alien_stats[0].sprite_name))
+        alien = Alien(self.session_stats, config.atlas.load_animation(self.session_stats.alien_stats[0].sprite_name))
 
         number_aliens_x = self._get_number_aliens_x(alien.rect.width)
         number_rows = self._get_number_rows(alien.rect.height)
 
         self.aliens.empty()
+        self.ufos.empty()
         self.explosions.empty()
         self.alien_bullets.empty()
 
@@ -78,7 +94,7 @@ class AlienFleet:
             for alien_number in range(number_aliens_x):
                 self._create_alien(alien_number, row_number)
 
-    def __check_fleet_edges(self):
+    def _check_fleet_edges(self):
         """Respond appropriately if any aliens have reached an edge."""
         for alien in self.aliens.sprites():
             if alien.check_edges():
@@ -89,7 +105,7 @@ class AlienFleet:
         """Drop the entire fleet and change the fleet's direction."""
         for alien in self.aliens.sprites():
             alien.rect.y += config.fleet_drop_speed
-        self.stats.fleet_direction *= -1
+        self.session_stats.fleet_direction *= -1
 
     @staticmethod
     def _get_number_aliens_x(alien_width):
@@ -101,7 +117,7 @@ class AlienFleet:
 
     def _get_number_rows(self, alien_height):
         """Determine the number of rows of aliens that fit on the screen"""
-        available_space_y = (config.screen_height - alien_height - 4 * self.ship.rect.height)
+        available_space_y = (config.screen_height - alien_height - 8 * self.ship.rect.height)
         number_rows = int(available_space_y / alien_height)
 
         return number_rows
@@ -109,13 +125,13 @@ class AlienFleet:
     def _create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row"""
         num_types = len(config.alien_stats)
-        alien_stats = self.stats.alien_stats[alien_number % num_types]
+        alien_stats = self.session_stats.alien_stats[alien_number % num_types]
 
-        alien = Alien(self.stats, config.atlas.load_animation(alien_stats.sprite_name))
+        alien = Alien(self.session_stats, config.atlas.load_animation(alien_stats.sprite_name))
 
         alien_width = alien.rect.width
         alien.rect.x = alien_width + alien_width * alien_number
-        alien.rect.y = alien.rect.height + alien.rect.height * row_number
+        alien.rect.y = alien.rect.height * 2 + alien.rect.height * row_number
         alien.position = alien.rect.x
         alien.alien_stats = alien_stats
 
@@ -154,10 +170,31 @@ class AlienFleet:
                     self._create_alien_explosion(an_alien)
                     self.on_kill(an_alien)
 
-        if len(self.aliens) == 0:
+        # remove any bullets and UFOs that have collided
+        collisions = pygame.sprite.groupcollide(bullets, self.ufos, True, True)
+
+        if collisions:
+            for ufos in collisions.values():
+                for ufo in ufos:
+                    self._create_alien_explosion(ufo)
+                    self.on_kill(ufo)
+
+        if len(self.aliens) == 0 and len(self.ufos) == 0:
             # If the entire fleet is destroyed, start a new level
             self.on_clear()
             self.create_new_fleet()
+
+    def _check_ufo_offscreen(self):
+        ufos = copy.copy(self.ufos.sprites())
+
+        for ufo in ufos:
+            # if ufo has moved off-screen, delete it without explosion or points
+            if ufo.speed < 0.0 and ufo.rect.right - ufo.rect.width < 0:
+                self.ufos.remove(ufo)
+                print("ufo offscreen")
+            elif ufo.speed > 0.0 and ufo.rect.left - ufo.rect.width > config.screen_width:
+                self.ufos.remove(ufo)
+                print("ufo offscreen")
 
     def _fire_alien_bullet(self, alien):
         self.bullet_elapsed = 0.0
@@ -175,6 +212,15 @@ class AlienFleet:
             r.bottom = alien.rect.bottom
             r.centerx = alien.rect.centerx
 
-            bullet = Bullet(self.stats.alien_bullet, r.center, bullet_anim)
+            bullet = Bullet(self.session_stats.alien_bullet, r.center, bullet_anim)
 
             self.alien_bullets.add(bullet)
+
+    def _spawn_ufo(self):
+        print("spawning ufo")
+        self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
+
+        ufo = Ufo(self.session_stats, config.atlas.load_animation("ufo"))
+        ufo.alien_stats = config.AlienStats("ufo", random.randrange(self.session_stats.ufo_stats.points))
+
+        self.ufos.add(ufo)

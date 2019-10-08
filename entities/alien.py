@@ -5,12 +5,12 @@ import config
 class Alien(Sprite):
     """A class to represent a single alien in the fleet"""
 
-    def __init__(self, stats, animation):
+    def __init__(self, session_stats, animation):
         super().__init__()
 
         """Initialize the alien and set its starting position"""
         self.animation = animation
-        self.stats = stats
+        self.session_stats = session_stats
 
         # store the alien's exact position
         self.position = 0.0
@@ -20,7 +20,7 @@ class Alien(Sprite):
 
     def update(self, elapsed):
         """Move the alien right or left."""
-        movement_amt = self.stats.alien_speed * self.stats.fleet_direction * elapsed
+        movement_amt = self.session_stats.alien_speed * self.session_stats.fleet_direction * elapsed
 
         self.position += movement_amt
 
@@ -32,7 +32,7 @@ class Alien(Sprite):
 
     def check_edges(self):
         """Return true if alien is at edge of screen."""
-        if self.rect.right >= config.screen_width and self.stats.fleet_direction > 0:
+        if self.rect.right >= config.screen_width and self.session_stats.fleet_direction > 0:
             return True
-        elif self.rect.left <= 0 and self.stats.fleet_direction < 0:
+        elif self.rect.left <= 0 and self.session_stats.fleet_direction < 0:
             return True

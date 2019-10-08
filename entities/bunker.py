@@ -11,7 +11,7 @@ def generate_bunker_surface():
 
     surf = pygame.Surface(wh)
 
-    bkg = pygame.Color('black')
+    bkg = config.transparent_color
     surf.fill(bkg)
     surf.set_colorkey(bkg)
 

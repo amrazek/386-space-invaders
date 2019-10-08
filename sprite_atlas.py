@@ -36,6 +36,9 @@ def load_atlas():
         frames = generate_explosion_frames(atlas.load_animation(key).image, 4, 1, 2, 8)
         atlas.initialize_animation_from_frames(key + "_explosion", frames, .25)
 
+    frames = generate_explosion_frames(atlas.load_animation("ufo").image, 4, 1, 2, 8)
+    atlas.initialize_animation_from_frames("ufo_explosion", frames, 1)
+
     config.atlas = atlas
 
 
