@@ -1,6 +1,9 @@
-alien = 132 0 60 58
-alien1 = 0 0 128 64
-alien2 = 0 68 128 64
-player_bullet = 132 98 6 12
-selector = 132 62 32 32
-ship = 0 136 96 32
+alien1 = 100 196 64 32
+alien2 = 168 196 64 32
+alien3 = 236 196 64 32
+alien4 = 304 196 64 32
+player_bullet = 460 196 6 12
+selector = 424 196 32 32
+ship = 0 196 96 32
+ship_no_engines = 372 196 48 32
+ufo = 0 0 640 192

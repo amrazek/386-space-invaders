@@ -17,7 +17,7 @@ class AlienFleet:
         self.on_kill = on_kill_callback
         self.on_player_collision = on_player_collision_callback
 
-        self.alien_types = ['alien1', 'alien2']
+        self.alien_types = ['alien3', 'alien4']
         self.aliens = Group()
 
         self.explosions = Group()

@@ -47,6 +47,14 @@ class Menu(GameState):
 
         self.selectors = Group(left_selector, right_selector)
 
+        # point values for aliens
+        self.aliens = Group()
+
+        ufo = config.atlas.load_animation("ufo")
+
+
+        self.aliens.add(ufo)
+
         # finish creating state values
         self.next_state = None
         self._set_selected(0)
@@ -54,6 +62,7 @@ class Menu(GameState):
     def update(self, elapsed):
         self.options.update(elapsed)
         self.selectors.update(elapsed)
+        self.aliens.update(elapsed)
 
         # handle selected item
         self._handle_arrow_keys()
@@ -63,6 +72,8 @@ class Menu(GameState):
         screen.fill(config.bg_color)
 
         screen.blit(self.title.image, self.title.rect)
+
+        self.aliens.draw(screen)
         self.options.draw(screen)
         self.selectors.draw(screen)
 

@@ -15,6 +15,11 @@ class BulletStats(NamedTuple):
         return self.width, self.height
 
 
+class AlienStats(NamedTuple):
+    sprite_name: str
+    points: int
+
+
 # Screen settings
 screen_width = 1000
 screen_height = 600

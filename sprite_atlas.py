@@ -15,8 +15,11 @@ def load_atlas():
     atlas.initialize_static("player_bullet", color_key=config.transparent_color, generate_mask=True)
     atlas.initialize_static("selector", color_key=config.transparent_color)
     atlas.initialize_animation("ship", 48, 32, 0.25, color_key=config.transparent_color)
-    atlas.initialize_animation("alien1", 64, 64, 5, color_key=config.transparent_color)
-    atlas.initialize_animation("alien2", 64, 64, 1, color_key=config.transparent_color)
+    atlas.initialize_animation("alien1", 32, 32, 1, color_key=config.transparent_color)
+    atlas.initialize_animation("alien2", 32, 32, 1, color_key=config.transparent_color)
+    atlas.initialize_animation("alien3", 32, 32, 1, color_key=config.transparent_color)
+    atlas.initialize_animation("alien4", 32, 32, 1, color_key=config.transparent_color)
+    atlas.initialize_animation("ufo", 64, 64, 1, color_key=config.transparent_color)
 
     # alien bullet frames
     frames = generate_alien_bullet_frames(config.default_alien_bullet.size, config.default_alien_bullet.color)
@@ -212,8 +215,8 @@ class SpriteAtlas:
 
         frames = [self.atlas.subsurface(
             pygame.Rect(x, y, frame_width, frame_height))
-            for x in range(rect.x, rect.x + rect.width, frame_width)
-            for y in range(rect.y, rect.y + rect.height, frame_height)]
+            for y in range(rect.y, rect.y + rect.height, frame_height)
+            for x in range(rect.x, rect.x + rect.width, frame_width)]
 
         if color_key is not None:
             # cannot use per-pixel alpha values in this case
