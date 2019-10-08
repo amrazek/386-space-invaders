@@ -39,9 +39,6 @@ class PlayerDeath(GameState):
             # Reduce player lives
             self.running_game.stats.decrease_lives()
 
-            # create a new fleet
-            self.running_game.fleet.create_new_fleet()
-
             # reset player position and state
             self.running_game.ship.center_ship()
 
