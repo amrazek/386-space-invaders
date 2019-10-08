@@ -25,6 +25,9 @@ class SessionStats:
         self.player_bullet = deepcopy(config.default_player_bullet)
         self.alien_bullet = deepcopy(config.default_alien_bullet)
 
+        self.fleet_shots_per_second = config.fleet_shots_per_second
+        self.fleet_max_shots_per_second = config.fleet_max_shots_per_second
+
     def set_level(self, level):
         self.level = level
 
@@ -51,14 +54,15 @@ class SessionStats:
     def __increase_speed(self):
         """Increase speed settings."""
         self.ship_speed *= config.speedup_scale
+        self.alien_speed *= config.speedup_scale
         self.player_bullet.speed *= config.speedup_scale
         self.alien_bullet.speed *= config.speedup_scale
         self.bullets_per_second *= config.speedup_scale
-        self.alien_speed *= config.speedup_scale
 
         for stats in self.alien_stats:
             stats.points = int(stats.points * config.score_scale)
 
         self.ufo_stats.points = int(self.ufo_stats.points * config.score_scale)
 
-        # todo: increase alien bullet speed, drop rate, etc?
+        self.fleet_shots_per_second *= config.speedup_scale
+        self.fleet_max_shots_per_second *= config.speedup_scale

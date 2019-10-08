@@ -63,6 +63,10 @@ ufo_stats = AlienStats(sprite_name="ufo", points=500)  # ufo worth **up to** thi
 ufo_min_delay = 1.  # ufo won't show up again for at least this many seconds
 ufo_max_delay = 2.  # a ufo will definitely appear at worst, every this many seconds
 
+fleet_shots_per_second = 0.5    # base rate: completely healthy fleet fires this many bullets per second
+fleet_max_shots_per_second = 3  # theoretical rate: a destroyed fleet would fire this many times per second
+
+
 # Bunker settings
 bunker_tile_size = 32
 bunker_count = 3

@@ -26,10 +26,10 @@ class AlienFleet:
         self.explosions = Group()
         self.create_new_fleet()
 
+        self.max_aliens = len(self.aliens)
         self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
 
-        # temp
-        self.bullet_elapsed = 999.0
+        self.next_shot_timer = 1. / session_stats.fleet_shots_per_second
 
     def update(self, elapsed):
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
@@ -64,11 +64,10 @@ class AlienFleet:
                 print("warning: alien spawned outside screen at {}".format(alien.rect.right))
                 break
 
-        # *** temp  ***
-        self.bullet_elapsed += elapsed
+        # is it time to fire another bullet?
+        self.next_shot_timer -= elapsed
 
-        # if self.bullet_elapsed > 1.0:
-        #     self._fire_alien_bullet(None)
+        self._update_shooting()
 
     def draw(self, screen):
         self.aliens.draw(screen)
@@ -216,3 +215,22 @@ class AlienFleet:
         ufo.alien_stats = config.AlienStats("ufo", random.randrange(self.session_stats.ufo_stats.points))
 
         self.ufos.add(ufo)
+
+    def _update_shooting(self):
+
+        if self.next_shot_timer < 0.:
+            num_aliens_alive = len(self.aliens)
+
+            if num_aliens_alive == 0:
+                return
+
+            # calculate how long till next shot
+            delta = self.session_stats.fleet_max_shots_per_second - self.session_stats.fleet_shots_per_second
+            alive_ratio = num_aliens_alive / self.max_aliens
+            shots_per_second = (1. - alive_ratio) * delta + self.session_stats.fleet_shots_per_second
+
+            self.next_shot_timer = 1. / shots_per_second
+
+            # select an alien to fire this bullet
+            alien = random.choice(self.aliens.sprites())
+            self._fire_alien_bullet(alien)
