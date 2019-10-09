@@ -1,3 +1,4 @@
+import pygame
 from .game_state import GameState
 from .player_death import PlayerDeath
 from entities.scoreboard import Scoreboard
@@ -8,6 +9,7 @@ from entities.ship import Ship
 from entities.bunker import Bunker
 import config
 import sounds
+
 
 class RunGame(GameState):
     """Manages actual game play, until the player loses."""
@@ -30,7 +32,8 @@ class RunGame(GameState):
         self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.alien_bullets)
         self.next_state = None
 
-        sounds.play_music(sounds.bg_music_name)
+        self.bg_music = sounds.bg_music_names[0]
+        sounds.play_music(self.bg_music)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
@@ -73,6 +76,28 @@ class RunGame(GameState):
     def _on_alien_killed(self, alien):
         self.stats.increase_score(alien.alien_stats.points)
         self.scoreboard.set_dirty()
+
+        # update music
+        next_music = self.bg_music
+        num_variations = len(sounds.bg_music_names)
+
+        # 0 - 0.33 -> 2
+        # 0.33 -> 0.66 -> 1
+        # 0.66 -> 1 = 0
+
+        for i in range(num_variations):
+            # 2 1 0
+            if self.fleet.alive_ratio < 1. / (i + 1):
+                next_music = sounds.bg_music_names[i]
+
+        if next_music != self.bg_music:
+            # change music track
+            sounds.play_music(next_music)
+            print("now playing ", next_music, " because fleet ratio is ", self.fleet.alive_ratio)
+            self.bg_music = next_music
+
+            if self.fleet.alive_ratio < 0.33:
+                pygame.mixer_music.set_volume(1.0)  # play music loudly for almost-dead fleet
 
     def _on_fleet_destroyed(self):
         # advance to next level

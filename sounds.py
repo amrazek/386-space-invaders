@@ -4,13 +4,16 @@ import pygame
 sounds = {}
 
 menu_music_name = "darkling-by-kevin-macleod.ogg"
-bg_music_name = "chase-pulse-faster-by-kevin-macleod.ogg"
+bg_music_names = ["chase-pulse-faster-by-kevin-macleod.ogg",
+                  "chase-pulse-faster-by-kevin-macleod_1.ogg",
+                  "chase-pulse-faster-by-kevin-macleod_2.ogg"]
 
 
-def play_music(name):
+def play_music(name, volume=0.5):
     try:
+        pygame.mixer_music.stop()
         pygame.mixer_music.load(os.path.join("music", name))
-        pygame.mixer_music.set_volume(0.33)
+        pygame.mixer_music.set_volume(volume)
         pygame.mixer_music.play(-1)
     except pygame.error:
         pass
@@ -62,5 +65,6 @@ def load_sounds():
 
                 try:
                     sounds[name] = pygame.mixer.Sound(file=full_path)
+                    sounds[name].set_volume(0.5)
                 except pygame.error:
                     print("ERROR: unable to load sound ", name)

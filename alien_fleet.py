@@ -250,3 +250,7 @@ class AlienFleet:
             # select an alien to fire this bullet
             alien = random.choice(self.aliens.sprites())
             self._fire_alien_bullet(alien)
+
+    @property
+    def alive_ratio(self):
+        return len(self.aliens) / self.max_aliens
