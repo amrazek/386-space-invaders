@@ -40,10 +40,11 @@ class HighScore(GameState):
         self.done = False
 
     def update(self, elapsed):
-        if any(self.input_state.key_codes) or self.input_state.left_down:
+        if any(self.input_state.key_codes) or self.input_state.left_down or self.input_state.quit:
             self.done = True
             self.input_state.key_codes.clear()
             self.input_state.left_down = False
+            self.input_state.quit = False  # escape to main menu rather than just exiting
 
         self.starfield.update(elapsed)
 
@@ -67,6 +68,10 @@ class HighScore(GameState):
         high_score_rect.centerx = config.screen_width // 2
         self.score_group.empty()
 
+        # pad score list out to 10, if necessary
+        padded_list = [_Score("???", -1) for _ in range(10 - len(self.high_scores))]
+        self.high_scores += padded_list
+
         score_counter = 1
 
         rect = None
@@ -84,7 +89,8 @@ class HighScore(GameState):
 
     def _render_high_score(self, available_width, place, high_score: _Score):
         place_image = self.font.render(str(place), True, config.text_color)
-        score_image = self.font.render(str(high_score.score), True, config.text_color)
+        score_image = self.font.render(str(high_score.score) if high_score.score > 0 else "???",
+                                       True, config.text_color)
         player_image = self.font.render(high_score.name, True, config.text_color)
 
         images = [place_image, score_image, player_image]
@@ -151,6 +157,8 @@ class HighScore(GameState):
 
 
 class EnterHighScore(GameState):
+    MAX_LEN = 12
+
     """Allows player to enter a new high score"""
     def __init__(self, input_state, game_stats: SessionStats, starfield=None):
         super().__init__(input_state)
@@ -193,18 +201,23 @@ class EnterHighScore(GameState):
                 self._update_name_image()
                 sounds.play("back")
             elif key_code == pygame.K_RETURN or key_code == pygame.K_KP_ENTER:
-                if len(self.entered_name) == 3:
+                if len(self.entered_name) > 0:
                     self.done = True
                     self.high_score_state.insert_high_score(self.entered_name, self.stats.score)
                     self.high_score_state.save_high_scores()
                     sounds.play("accept")
                 else:
                     sounds.play("wrong")
-            elif len(self.entered_name) < 3 and self._is_accepted_key_code(key_code):
+            elif len(self.entered_name) < EnterHighScore.MAX_LEN and self._is_accepted_key_code(key_code):
                 letter = chr(key_code)
                 self.entered_name += letter
                 self._update_name_image()
                 sounds.play("type")
+
+        # allow player to skip by pressing escape
+        if self.input_state.quit:
+            self.done = True
+            self.input_state.quit = False
 
     def draw(self, screen):
         screen.fill(config.bg_color)
@@ -225,6 +238,7 @@ class EnterHighScore(GameState):
         return self.high_score_state
 
     def _update_name_image(self):
-        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name.ljust(3, '_'), True,
+        self.entered_name_image = self.font.render("Enter Name: " + self.entered_name.ljust(EnterHighScore.MAX_LEN, '_')
+                                                   , True,
                                                    config.text_color)
         self.entered_name_rect = self.entered_name_rect or self.entered_name_image.get_rect()

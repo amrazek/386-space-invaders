@@ -1,3 +1,4 @@
+import os
 import pygame
 from states.menu import Menu
 from states.input_state import InputState
@@ -12,6 +13,7 @@ def run_game():
         pygame.mixer.pre_init(22050, -16, 2, 1024)
 
     # initialize PyGame and create screen surface
+    os.environ['SDL_VIDEO_CENTERED'] = '1'
     pygame.init()
 
     screen = pygame.display.set_mode((config.screen_width, config.screen_height))

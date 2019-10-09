@@ -41,7 +41,7 @@ default_player_bullet = BulletStats(
     speed=300.0,
     color=Color('white'))
 
-bullets_allowed = 3
+bullets_per_second = 5
 
 # alien bullet settings
 default_alien_bullet = BulletStats(
@@ -56,8 +56,7 @@ fleet_drop_speed = 0
 alien_stats = [
     AlienStats(sprite_name="alien1", points=10),
     AlienStats(sprite_name="alien2", points=15),
-    AlienStats(sprite_name="alien3", points=20),
-    AlienStats(sprite_name="alien4", points=25)
+    AlienStats(sprite_name="alien3", points=20)
 ]
 
 ufo_stats = AlienStats(sprite_name="ufo", points=500)  # ufo worth **up to** this many points (random)
@@ -65,7 +64,7 @@ ufo_min_delay = 15.  # ufo won't show up again for at least this many seconds
 ufo_max_delay = 50.  # a ufo will definitely appear at worst, every this many seconds
 
 fleet_shots_per_second = 0.5    # base rate: completely healthy fleet fires this many bullets per second
-fleet_max_shots_per_second = 3  # theoretical rate: a destroyed fleet would fire this many times per second
+fleet_max_shots_per_second = 2  # theoretical rate: a destroyed fleet would fire this many times per second
 
 
 # Bunker settings

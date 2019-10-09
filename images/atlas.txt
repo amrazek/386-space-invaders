@@ -1,10 +1,9 @@
 alien1 = 200 196 64 32
 alien2 = 268 196 64 32
 alien3 = 336 196 64 32
-alien4 = 404 196 64 32
 bunker = 0 196 96 64
 player_bullet = 100 232 6 12
-selector = 524 196 32 32
+selector = 456 196 32 32
 ship = 100 196 96 32
-ship_no_engines = 472 196 48 32
+ship_no_engines = 404 196 48 32
 ufo = 0 0 640 192

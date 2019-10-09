@@ -10,7 +10,7 @@ import sounds
 
 
 class Menu(GameState):
-    TitleSize = 48
+    TitleSize = 64
     MenuItemSize = 32
     MenuItemSpacing = 16
 
@@ -18,11 +18,21 @@ class Menu(GameState):
         super().__init__(input_state)
         self.font = pygame.font.SysFont(None, Menu.TitleSize)
         self.starfield = starfield or Starfield()
-
+        self.title = Group()
         # create "Space Invaders" logo
-        self.title = StaticAnimation(self.font.render("Space Invaders", True, config.green_color))
-        self.title.rect.centerx = config.screen_rect.centerx
-        self.title.rect.centery = config.screen_height // 8
+
+        # green "SPACE"
+        space_title = StaticAnimation(self.font.render("SPACE", True, config.green_color))
+        space_title.rect.centerx = config.screen_rect.centerx
+        space_title.rect.centery = config.screen_height // 8
+
+        # white "INVADERS"
+        self.font = pygame.font.SysFont(None, Menu.TitleSize // 2)
+        invaders_title = StaticAnimation(self.font.render("INVADERS", True, pygame.Color('white')))
+        invaders_title.rect.left = space_title.rect.left + space_title.rect.width // 8
+        invaders_title.rect.top = space_title.rect.bottom + 10
+
+        self.title.add(space_title, invaders_title)
 
         last_y = config.screen_height - config.screen_height // 3
         self.options = Group()
@@ -35,7 +45,7 @@ class Menu(GameState):
             option_sprite = StaticAnimation(self.font.render(option[0], True, config.text_color))
             option_sprite.callback = option[1]
 
-            option_sprite.rect.centerx = self.title.rect.centerx
+            option_sprite.rect.centerx = config.screen_width // 2
             option_sprite.rect.top = last_y
 
             last_y = option_sprite.rect.bottom + Menu.MenuItemSpacing
@@ -53,7 +63,7 @@ class Menu(GameState):
         # point values for aliens
         self.aliens = Group()
 
-        y_pos = self.title.rect.bottom + 50
+        y_pos = invaders_title.rect.bottom + 50
 
         for alien_stats in config.alien_stats:
             alien = config.atlas.load_animation(alien_stats.sprite_name).frames[0]
@@ -86,7 +96,8 @@ class Menu(GameState):
         screen.fill(config.bg_color)
 
         self.starfield.draw(screen)
-        screen.blit(self.title.image, self.title.rect)
+        #screen.blit(self.title.image, self.title.rect)
+        self.title.draw(screen)
 
         self.aliens.draw(screen)
         self.options.draw(screen)
@@ -185,6 +196,6 @@ class Menu(GameState):
         sprite = StaticAnimation(surf)
 
         sprite.rect.top = top_coord
-        sprite.rect.centerx = self.title.rect.centerx
+        sprite.rect.centerx = config.screen_rect.centerx
 
         return sprite

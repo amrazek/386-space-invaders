@@ -27,7 +27,6 @@ class Ship(Sprite):
         self.center = float(self.rect.centerx)
 
         self.last_shot = 0
-        self.min_time_between_shots = 1. / stats.bullets_per_second
         self.wait_time_to_shoot = 0.0
 
     def update(self, input_state, elapsed):
@@ -57,7 +56,9 @@ class Ship(Sprite):
         if self.wait_time_to_shoot > 0.:
             return
 
-        self.wait_time_to_shoot = self.min_time_between_shots
+        min_time_between_shots = 1. / self.stats.bullets_per_second
+
+        self.wait_time_to_shoot = min_time_between_shots
 
         bullet_anim = config.atlas.load_static("player_bullet")
         r = pygame.Rect(0, 0, bullet_anim.width, bullet_anim.height)

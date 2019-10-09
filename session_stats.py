@@ -1,4 +1,6 @@
 import config
+from config import BulletStats
+from config import AlienStats
 from copy import deepcopy
 
 
@@ -9,7 +11,7 @@ class SessionStats:
         """Initialize statistics."""
         self.ship_speed = 450       # pixels per second
         self.alien_speed = 100
-        self.bullets_per_second = 5
+        self.bullets_per_second = config.bullets_per_second
 
         # fleet_direction of 1 represents right; -1 represents left
         self.fleet_direction = 1
@@ -55,14 +57,28 @@ class SessionStats:
         """Increase speed settings."""
         self.ship_speed *= config.speedup_scale
         self.alien_speed *= config.speedup_scale
-        self.player_bullet.speed *= config.speedup_scale  # todo: these are tuples and can't be set
-        self.alien_bullet.speed *= config.speedup_scale
+
+        # improve player bullet speed
+        self.player_bullet = BulletStats(self.player_bullet.width,
+                                         self.player_bullet.height,
+                                         self.player_bullet.speed * config.speedup_scale,
+                                         self.player_bullet.color)
         self.bullets_per_second *= config.speedup_scale
 
-        for stats in self.alien_stats:
-            stats.points = int(stats.points * config.score_scale)
+        # improve enemy bullet speed
+        self.alien_bullet = BulletStats(self.alien_bullet.width,
+                                        self.alien_bullet.height,
+                                        self.alien_bullet.speed * config.speedup_scale,
+                                        self.alien_bullet.color)
 
-        self.ufo_stats.points = int(self.ufo_stats.points * config.score_scale)
+        # improve alien stats
+        self.alien_stats = [AlienStats(
+            sprite_name=alien.sprite_name,
+            points=int(alien.points * config.score_scale)
+        ) for alien in self.alien_stats]
 
+        self.ufo_stats = AlienStats(self.ufo_stats.sprite_name, int(self.ufo_stats.points * config.score_scale))
+
+        # improve fleet rate of fire
         self.fleet_shots_per_second *= config.speedup_scale
         self.fleet_max_shots_per_second *= config.speedup_scale
