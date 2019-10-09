@@ -33,7 +33,6 @@ class RunGame(GameState):
         self.next_state = None
 
         self.bg_music = sounds.bg_music_names[0]
-        sounds.play_music(self.bg_music)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)
@@ -69,6 +68,9 @@ class RunGame(GameState):
 
     def get_next(self):
         return self.next_state
+
+    def start(self):
+        sounds.play_music(self.bg_music)
 
     def _player_destroyed(self):
         self.next_state = self.next_state or PlayerDeath(self.input_state, self)

@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Group
 import config
 from .game_state import GameState
-from states.run_game import RunGame
+from states.ready import Ready
 from .high_score import HighScore
 from animation import StaticAnimation
 from starfield import Starfield
@@ -97,7 +97,6 @@ class Menu(GameState):
         screen.fill(config.bg_color)
 
         self.starfield.draw(screen)
-        #screen.blit(self.title.image, self.title.rect)
         self.title.draw(screen)
 
         self.aliens.draw(screen)
@@ -112,8 +111,7 @@ class Menu(GameState):
         return self.next_state
 
     def _play_game(self):
-        self.next_state = RunGame(self.input_state)
-        pygame.mouse.set_visible(False)
+        self.next_state = Ready(self.input_state)
 
     def _view_high_scores(self):
         self.next_state = HighScore(self.input_state, self.starfield)

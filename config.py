@@ -51,7 +51,7 @@ default_alien_bullet = BulletStats(
     color=Color('green'))
 
 # Alien settings
-fleet_drop_speed = 0
+fleet_drop_speed = 10
 
 alien_stats = [
     AlienStats(sprite_name="alien1", points=10),
