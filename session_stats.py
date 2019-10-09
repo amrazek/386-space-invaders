@@ -55,7 +55,7 @@ class SessionStats:
         """Increase speed settings."""
         self.ship_speed *= config.speedup_scale
         self.alien_speed *= config.speedup_scale
-        self.player_bullet.speed *= config.speedup_scale
+        self.player_bullet.speed *= config.speedup_scale  # todo: these are tuples and can't be set
         self.alien_bullet.speed *= config.speedup_scale
         self.bullets_per_second *= config.speedup_scale
 

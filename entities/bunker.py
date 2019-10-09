@@ -2,7 +2,7 @@ import random
 import pygame
 from pygame.sprite import Sprite
 import config
-
+import sounds
 
 class BunkerFragment(Sprite):
     def __init__(self, surf, center_position):
@@ -28,10 +28,15 @@ class BunkerFragment(Sprite):
 
     @property
     def dead(self):
-        return self.health == 0
+        return self.health <= 0
 
     def damage(self):
         self.health -= 1
+
+        if not self.dead:
+            sounds.play("hit")
+        else:
+            sounds.play("explosion3")
 
         # apply damage effect to this section
         if self.health <= 0:

@@ -4,9 +4,13 @@ from states.input_state import InputState
 from timer import game_timer
 from sprite_atlas import load_atlas
 import config
+import sounds
 
 
 def run_game():
+    if pygame.mixer:
+        pygame.mixer.pre_init(22050, -16, 2, 1024)
+
     # initialize PyGame and create screen surface
     pygame.init()
 
@@ -15,6 +19,9 @@ def run_game():
 
     # load all animated sprite images needed for the game
     load_atlas()
+
+    # load sounds
+    sounds.load_sounds()
 
     # init game
     input_state = InputState()

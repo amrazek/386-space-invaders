@@ -2,6 +2,7 @@ import pygame
 from states.game_state import GameState
 from states.high_score import EnterHighScore
 import config
+import sounds
 
 
 class GameOver(GameState):
@@ -10,6 +11,7 @@ class GameOver(GameState):
     def __init__(self, input_state, previous_state):
         super().__init__(input_state)
 
+        sounds.silence()
         self.previous_state = previous_state
 
         # create game over text

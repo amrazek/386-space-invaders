@@ -2,6 +2,7 @@ from .game_state import GameState
 from .game_over import GameOver
 from animation import OneShotAnimation
 import config
+import sounds
 
 
 class PlayerDeath(GameState):
@@ -16,6 +17,7 @@ class PlayerDeath(GameState):
 
         self.running_game = running_game
         self.next_state = None
+        sounds.play("explosion1")
 
     def update(self, elapsed):
         self.running_game.update(0.)

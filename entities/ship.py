@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 from entities.bullet import Bullet
 import config
+import sounds
 
 
 class Ship(Sprite):
@@ -66,3 +67,4 @@ class Ship(Sprite):
         bullet = Bullet(self.stats.player_bullet, r.center, bullet_anim)
 
         self.bullet_manager.add(bullet)
+        sounds.play("laser1")

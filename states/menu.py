@@ -6,6 +6,7 @@ from states.run_game import RunGame
 from .high_score import HighScore
 from animation import StaticAnimation
 from starfield import Starfield
+import sounds
 
 
 class Menu(GameState):
@@ -145,6 +146,9 @@ class Menu(GameState):
 
         idx = idx % len(self.options.sprites())
 
+        if hasattr(self, "selected_index") and idx != self.selected_index:
+            sounds.play("select")
+
         self.selected_index = idx
 
         # align selectors to current option
@@ -166,6 +170,8 @@ class Menu(GameState):
 
         surf = pygame.Surface((alien_rect.width + point_value.get_width() + 20,
                                max(alien_rect.height, point_value.get_height())))
+        surf = surf.convert_alpha(pygame.display.get_surface())  # want 32 bit surface for per-pixel alpha
+        surf.fill((0, 0, 0, 0))  # fill with transparent, note no color key
 
         # center alien rect vertically
         alien_rect.centery = surf.get_height() // 2

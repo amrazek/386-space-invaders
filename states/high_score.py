@@ -6,6 +6,7 @@ from session_stats import SessionStats
 from animation import StaticAnimation
 from starfield import Starfield
 import config
+import sounds
 
 
 class _Score(NamedTuple):
@@ -190,17 +191,20 @@ class EnterHighScore(GameState):
             if key_code == pygame.K_BACKSPACE:
                 self.entered_name = self.entered_name[:-1]
                 self._update_name_image()
+                sounds.play("back")
             elif key_code == pygame.K_RETURN or key_code == pygame.K_KP_ENTER:
                 if len(self.entered_name) == 3:
                     self.done = True
                     self.high_score_state.insert_high_score(self.entered_name, self.stats.score)
                     self.high_score_state.save_high_scores()
+                    sounds.play("accept")
                 else:
-                    print("name denied: need 3 letters")  # todo: error sound?
+                    sounds.play("wrong")
             elif len(self.entered_name) < 3 and self._is_accepted_key_code(key_code):
                 letter = chr(key_code)
                 self.entered_name += letter
                 self._update_name_image()
+                sounds.play("type")
 
     def draw(self, screen):
         screen.fill(config.bg_color)

@@ -7,6 +7,7 @@ from entities.ufo import Ufo
 from entities.bullet import Bullet
 from animation import OneShotAnimation
 import config
+import sounds
 
 
 class AlienFleet:
@@ -87,6 +88,8 @@ class AlienFleet:
         self.explosions.empty()
         self.alien_bullets.empty()
 
+        sounds.silence()
+
         # Create the first row of aliens
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
@@ -148,6 +151,7 @@ class AlienFleet:
         explosion.rect.center = alien.rect.center
 
         self.explosions.add(explosion)
+        sounds.play("explosion1.wav")
 
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
@@ -187,10 +191,13 @@ class AlienFleet:
 
         for ufo in ufos:
             # if ufo has moved off-screen, delete it without explosion or points
-            if ufo.speed < 0.0 and ufo.rect.right - ufo.rect.width < 0:
+            if ufo.speed < 0.0 and ufo.rect.right < 0:
                 self.ufos.remove(ufo)
-            elif ufo.speed > 0.0 and ufo.rect.left - ufo.rect.width > config.screen_width:
+            elif ufo.speed > 0.0 and ufo.rect.left > config.screen_width:
                 self.ufos.remove(ufo)
+
+        if len(self.ufos) == 0:
+            sounds.fade_out("ufo", 250)
 
     def _fire_alien_bullet(self, alien):
         self.bullet_elapsed = 0.0
@@ -207,6 +214,7 @@ class AlienFleet:
         bullet = Bullet(self.session_stats.alien_bullet, r.center, bullet_anim)
 
         self.alien_bullets.add(bullet)
+        sounds.play("laser2")
 
     def _spawn_ufo(self):
         self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
@@ -215,6 +223,8 @@ class AlienFleet:
         ufo.alien_stats = config.AlienStats("ufo", random.randrange(self.session_stats.ufo_stats.points))
 
         self.ufos.add(ufo)
+        if not sounds.is_playing("ufo"):
+            sounds.fade_in("ufo", 250, True)
 
     def _update_shooting(self):
 
