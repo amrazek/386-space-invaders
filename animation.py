@@ -95,16 +95,14 @@ class StaticAnimation(Animation):
 
 class OneShotAnimation(Animation):
     def __init__(self, frames, duration, on_complete_callback=None):
-        if not isinstance(frames, list):
+        if not isinstance(frames, list):  # allow single-frame "animations"
             frames = [frames]
 
         super().__init__(frames, duration=duration)
 
         self.on_complete = on_complete_callback
         self.finished = False
-        self.finished_image = Surface((1, 1))
-        self.finished_image.fill(config.transparent_color)
-        self.finished_image.set_colorkey(config.transparent_color)
+        self.num_frames = len(frames)
 
     @staticmethod
     def from_animation(animation, duration=None, on_complete_callback=None):
@@ -114,17 +112,14 @@ class OneShotAnimation(Animation):
         if self.finished:
             return
 
-        # if the frame has changed and the new frame is less than the old
-        # frame, the animation played out completely
-        # note that we don't just check if on last frame: it's possible, though unlikely, that
-        # an animation skips a frame entirely if enough time has elapsed
-        current_frame = self.current_frame_index
-        super().update(elapsed)
-        new_frame = self.current_frame_index
+        last_accum = self.accumulator
+        last_frame = self.current_frame_index
 
-        if current_frame != new_frame and new_frame < current_frame:
+        super().update(elapsed)
+
+        if self.current_frame_index < last_frame or (self.num_frames == 1 and self.accumulator < last_accum):
+            # note: we use accumulator above because some "animations" (static, temporary) only have one frame
             if self.on_complete is not None:
                 self.on_complete()
 
             self.finished = True
-            self.current_frame = self.finished_image

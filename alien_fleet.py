@@ -32,6 +32,12 @@ class AlienFleet:
 
         self.next_shot_timer = 1. / session_stats.fleet_shots_per_second
 
+        self.font = pygame.font.SysFont(None, 24)
+
+        # if this is the first level, hard-code the appearance of a UFO so it's clear that requirement was met
+        if self.session_stats.level == 0:
+            self.next_ufo_appearance = 5.0
+
     def update(self, elapsed):
         # Check if the fleet is at an edge, and then update the positions of all aliens in the fleet
         self._check_fleet_edges()
@@ -59,15 +65,8 @@ class AlienFleet:
         if self.next_ufo_appearance < 0:
             self._spawn_ufo()
 
-        # todo: fix case where aliens spawn outside screen
-        for alien in self.aliens:
-            if alien.rect.right > config.screen_width:
-                print("warning: alien spawned outside screen at {}".format(alien.rect.right))
-                break
-
         # is it time to fire another bullet?
         self.next_shot_timer -= elapsed
-
         self._update_shooting()
 
     def draw(self, screen):
@@ -138,10 +137,15 @@ class AlienFleet:
 
         self.aliens.add(alien)
 
-    def _create_alien_explosion(self, alien):
+    def _create_alien_explosion(self, alien, as_points=False):
         """Create an alien explosion located where this alien is"""
-        explosion_animation = config.atlas.load_animation(alien.alien_stats.sprite_name + "_explosion")
-        explosion = OneShotAnimation.from_animation(explosion_animation)
+        if not as_points:
+            explosion_animation = config.atlas.load_animation(alien.alien_stats.sprite_name + "_explosion")
+            explosion = OneShotAnimation.from_animation(explosion_animation)
+        else:
+            score_str = "{:,}".format(alien.alien_stats.points)
+            surf = self.font.render(score_str, True, config.green_color)
+            explosion = OneShotAnimation(surf, 0.5)
 
         # a little closure to automatically remove explosion when it's done running
         def die_on_finish():
@@ -178,7 +182,7 @@ class AlienFleet:
         if collisions:
             for ufos in collisions.values():
                 for ufo in ufos:
-                    self._create_alien_explosion(ufo)
+                    self._create_alien_explosion(ufo, True)
                     self.on_kill(ufo)
 
         if len(self.aliens) == 0 and len(self.ufos) == 0:
@@ -220,7 +224,9 @@ class AlienFleet:
         self.next_ufo_appearance = random.uniform(config.ufo_min_delay, config.ufo_max_delay)
 
         ufo = Ufo(self.session_stats, config.atlas.load_animation("ufo"))
-        ufo.alien_stats = config.AlienStats("ufo", random.randrange(self.session_stats.ufo_stats.points))
+
+        rounded_score = int(round(random.randrange(self.session_stats.ufo_stats.points), -1))
+        ufo.alien_stats = config.AlienStats("ufo", rounded_score)
 
         self.ufos.add(ufo)
         if not sounds.is_playing("ufo"):
