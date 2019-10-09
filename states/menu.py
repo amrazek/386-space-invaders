@@ -90,8 +90,8 @@ class Menu(GameState):
         self.aliens.update(elapsed)
 
         # handle selected item
-        self._handle_arrow_keys()
-        self._handle_mouse_clicks()
+        if not self._handle_mouse_clicks():
+            self._handle_arrow_keys()
 
     def draw(self, screen):
         screen.fill(config.bg_color)
@@ -146,7 +146,7 @@ class Menu(GameState):
                     option.callback()
                     self.input_state.left_down = False
 
-                break
+                return True
 
             idx += 1
 

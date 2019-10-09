@@ -12,7 +12,7 @@ import sounds
 
 class AlienFleet:
     def __init__(self, session_stats, ship, player_bullets, alien_bullets,
-                 on_clear_callback, on_kill_callback, on_player_collision_callback):
+                 on_clear_callback, on_kill_callback, on_player_collision_callback, on_bottom_callback):
         self.session_stats = session_stats
         self.ship = ship
         self.player_bullets = player_bullets
@@ -20,6 +20,7 @@ class AlienFleet:
         self.on_clear = on_clear_callback
         self.on_kill = on_kill_callback
         self.on_player_collision = on_player_collision_callback
+        self.on_bottom = on_bottom_callback
 
         self.aliens = Group()
         self.ufos = Group()
@@ -161,8 +162,7 @@ class AlienFleet:
         """Check if any aliens have reached the bottom of the screen."""
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= config.screen_height:
-                # Treat this the same as if the ship got hit
-                self.on_player_collision()
+                self.on_bottom()
                 break
 
     def _check_bullet_alien_collisions(self, bullets):

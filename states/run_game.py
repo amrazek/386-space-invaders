@@ -1,6 +1,7 @@
 import pygame
 from .game_state import GameState
 from .player_death import PlayerDeath
+from .game_over import GameOver
 from entities.scoreboard import Scoreboard
 from entities.bullet import BulletManager
 from session_stats import SessionStats
@@ -27,7 +28,8 @@ class RunGame(GameState):
         self.fleet = AlienFleet(self.stats, self.ship, self.player_bullets, self.alien_bullets,
                                 on_clear_callback=self._on_fleet_destroyed,
                                 on_kill_callback=self._on_alien_killed,
-                                on_player_collision_callback=self._player_destroyed)
+                                on_player_collision_callback=self._player_destroyed,
+                                on_bottom_callback=self._on_aliens_reached_bottom)
 
         self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.alien_bullets)
         self.next_state = None
@@ -95,7 +97,6 @@ class RunGame(GameState):
         if next_music != self.bg_music:
             # change music track
             sounds.play_music(next_music)
-            print("now playing ", next_music, " because fleet ratio is ", self.fleet.alive_ratio)
             self.bg_music = next_music
 
             if self.fleet.alive_ratio < 0.33:
@@ -111,3 +112,7 @@ class RunGame(GameState):
 
         # reset scoreboard
         self.scoreboard.set_dirty()
+
+    def _on_aliens_reached_bottom(self):
+        # player loses
+        self.next_state = GameOver(self.input_state, self)
