@@ -3,6 +3,18 @@ import pygame
 
 sounds = {}
 
+menu_music_name = "darkling-by-kevin-macleod.ogg"
+bg_music_name = "chase-pulse-faster-by-kevin-macleod.ogg"
+
+
+def play_music(name):
+    try:
+        pygame.mixer_music.load(os.path.join("music", name))
+        pygame.mixer_music.set_volume(0.33)
+        pygame.mixer_music.play(-1)
+    except pygame.error:
+        pass
+
 
 def play(sound_name, loop=False):
     if sound_name in sounds:

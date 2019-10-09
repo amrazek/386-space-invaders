@@ -7,7 +7,7 @@ from alien_fleet import AlienFleet
 from entities.ship import Ship
 from entities.bunker import Bunker
 import config
-
+import sounds
 
 class RunGame(GameState):
     """Manages actual game play, until the player loses."""
@@ -29,6 +29,8 @@ class RunGame(GameState):
 
         self.bunkers = Bunker.create_bunkers(config.bunker_count, self.ship, self.player_bullets, self.alien_bullets)
         self.next_state = None
+
+        sounds.play_music(sounds.bg_music_name)
 
     def update(self, elapsed):
         self.ship.update(self.input_state, elapsed)

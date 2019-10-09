@@ -81,6 +81,7 @@ class Menu(GameState):
         self._set_selected(0)
 
         pygame.mouse.set_visible(True)
+        sounds.play_music(sounds.menu_music_name)
 
     def update(self, elapsed):
         self.starfield.update(elapsed)
