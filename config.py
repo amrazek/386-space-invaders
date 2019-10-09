@@ -38,20 +38,20 @@ ship_limit = 3  # player has this many extra lives. Next death after this will r
 default_player_bullet = BulletStats(
     width=30,
     height=15,
-    speed=300.0,
+    speed=350.0,
     color=Color('white'))
 
-bullets_per_second = 5
+bullets_per_second = 7.5
 
 # alien bullet settings
 default_alien_bullet = BulletStats(
     width=6,
     height=12,
-    speed=-60.0,
+    speed=-50.0,
     color=Color('green'))
 
 # Alien settings
-fleet_drop_speed = 10
+fleet_drop_speed = 5
 
 alien_stats = [
     AlienStats(sprite_name="alien1", points=10),

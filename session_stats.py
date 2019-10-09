@@ -10,7 +10,7 @@ class SessionStats:
     def __init__(self):
         """Initialize statistics."""
         self.ship_speed = 450       # pixels per second
-        self.alien_speed = 100
+        self.alien_speed = 30
         self.bullets_per_second = config.bullets_per_second
 
         # fleet_direction of 1 represents right; -1 represents left
