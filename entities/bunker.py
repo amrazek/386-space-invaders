@@ -4,6 +4,7 @@ from pygame.sprite import Sprite
 import config
 import sounds
 
+
 class BunkerFragment(Sprite):
     def __init__(self, surf, center_position):
         super().__init__()

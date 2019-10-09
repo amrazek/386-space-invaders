@@ -1,4 +1,3 @@
-import pygame
 from states.game_state import GameState
 from states.high_score import EnterHighScore
 import config

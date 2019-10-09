@@ -51,8 +51,6 @@ class _Star:
         self.color.g = max(0, min(255, int(self.color.g + (ratio * variation[1]))))
         self.color.b = max(0, min(255, int(self.color.b + (ratio * variation[2]))))
 
-        #print(self.color)
-
     def draw(self, screen):
         # the star itself
         pygame.draw.circle(screen, self.color, (int(self.position.x), int(self.position.y)), self.radius)
@@ -60,9 +58,6 @@ class _Star:
         # trailing line
         line_color = copy.copy(self.color)
         line_color.a = 50
-
-        #pygame.draw.line(screen, line_color, self.position, self.position - self.velocity * Starfield.TRAIL_RATIO)
-        #pygame.draw.aaline(screen, line_color, self.position, self.position - self.velocity * Starfield.TRAIL_RATIO)
 
 
 class Starfield:
@@ -72,7 +67,9 @@ class Starfield:
     MIN_SIZE = 1
     MAX_SIZE = 4
     TRAIL_RATIO = 5   # stars will have a trail of length [this ratio of their speed]
-    COLOR = Color(200, 200, 200)
+    COLOR = pygame.Color('white')
+    COLOR.r, COLOR.g, COLOR.b = 200, 200, 200
+
     COLOR_VARIATION = (25, 25, 25)  # stars will vary their color +- this amount over twinkle duration
     TWINKLE_DURATION = 2.0  # stars will go min color -> max color -> min color in this many seconds
 
@@ -95,9 +92,14 @@ class Starfield:
         speed = Starfield.MIN_SPEED + random.uniform(0., delta_speed)
 
         # set velocity
-        velocity = Vector2(-1., 0.) * speed
+        velocity = Vector2()
+        velocity.x, velocity.y = -1., 0.
+        velocity = velocity * speed
 
-        return _Star(Vector2(x, y), velocity, random.uniform(0, Starfield.TWINKLE_DURATION), size)
+        position = Vector2()
+        position.x, position.y = x, y
+
+        return _Star(position, velocity, random.uniform(0, Starfield.TWINKLE_DURATION), size)
 
     def update(self, elapsed):
         for star in self.stars:

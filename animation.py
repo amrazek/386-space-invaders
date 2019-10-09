@@ -1,6 +1,4 @@
-from pygame import Surface
 from pygame.sprite import Sprite
-import config
 
 
 class Animation(Sprite):

@@ -5,4 +5,4 @@ from .ship import *
 from .scoreboard import *
 from .ufo import *
 
-__all__ = [ "alien", "bullet", "bunker", "scoreboard", "ship", "ufo"]
+__all__ = ["alien", "bullet", "bunker", "scoreboard", "ship", "ufo"]
